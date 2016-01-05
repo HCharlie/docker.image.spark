@@ -4,10 +4,10 @@ FROM takaomag/base:2015.12.07.05.00
 
 ENV \
     X_DOCKER_REPO_NAME=spark \
-    X_SPARK_VERSION=1.5.2
+    X_SPARK_VERSION=1.6.0
 
 RUN \
-    echo "2015-12-07-0" > /dev/null && \
+    echo "2016-01-05-0" > /dev/null && \
     export TERM=dumb && \
     export LANG='en_US.UTF-8' && \
     source /opt/local/bin/x-set-shell-fonts-env.sh && \
