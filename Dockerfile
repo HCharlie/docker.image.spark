@@ -22,6 +22,7 @@ RUN \
     sudo -u nobody yaourt -S --needed --noconfirm --noprogressbar "${REQUIRED_PACKAGES[@]}" && \
     echo -e "${FONT_SUCCESS}[SUCCESS] Installed required packages [${REQUIRED_PACKAGES[@]}]${FONT_DEFAULT}" && \
     echo -e "${FONT_INFO}[INFO] Installing netlib-java=1.1.2${FONT_DEFAULT}" && \
+    cd /tmp && \
     git clone https://github.com/fommil/netlib-java.git && \
     cd netlib-java && \
     git checkout -b 1.1.2 refs/tags/1.1.2 && \
@@ -34,14 +35,14 @@ RUN \
     cd xbuilds/linux-x86_64 && \
     mvn -fn package && \
     cd ../../../native_ref && \
-    mvn package && \
-    cd xbuilds/linux-x86_64
-    mvn package && \
-    cd /tmp && \
-    mv netlib-java/native_system/xbuilds/linux-x86_64/target/netlib-native_system-linux-x86_64.so /usr/lib/libnetlib-native_system-linux-x86_64.so && \
-    mv netlib-java/native_ref/xbuilds/linux-x86_64/target/netlib-native_ref-linux-x86_64.so /usr/lib/libnetlib-native_ref-linux-x86_64.so && \
+    mvn -fn package && \
+    cd xbuilds/linux-x86_64 && \
+    mvn -fn package && \
+    mv /tmp/netlib-java/native_system/xbuilds/linux-x86_64/target/netlib-native_system-linux-x86_64.so /usr/lib/libnetlib-native_system-linux-x86_64.so && \
+    mv /tmp/netlib-java/native_ref/xbuilds/linux-x86_64/target/netlib-native_ref-linux-x86_64.so /usr/lib/libnetlib-native_ref-linux-x86_64.so && \
     ldconfig && \
-    rm -rf netlib-java && \
+    cd /tmp && \
+    rm -rf /tmp/netlib-java && \
     echo -e "${FONT_INFO}[INFO] Installed netlib-java=1.1.2${FONT_DEFAULT}" && \
     echo -e "${FONT_INFO}[INFO] Installing spark-${X_SPARK_VERSION}${FONT_DEFAULT}" && \
     ([ -d /opt/local ] || mkdir -p /opt/local) && cd /opt/local && \
