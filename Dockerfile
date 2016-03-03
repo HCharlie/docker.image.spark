@@ -2,14 +2,14 @@
 # - build with netlib-java
 # http://qiita.com/adachij2002/items/b9af506d704434f4f293
 
-FROM takaomag/base:2015.12.07.05.00
+FROM takaomag/base:2016.03.03.02.28
 
 ENV \
     X_DOCKER_REPO_NAME=spark \
     X_SPARK_VERSION=1.6.0
 
 RUN \
-    echo "2016-01-08-0" > /dev/null && \
+    echo "2016-03-03-0" > /dev/null && \
     export TERM=dumb && \
     export LANG='en_US.UTF-8' && \
     source /opt/local/bin/x-set-shell-fonts-env.sh && \
