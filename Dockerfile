@@ -2,14 +2,14 @@
 # - build with netlib-java
 # http://qiita.com/adachij2002/items/b9af506d704434f4f293
 
-FROM takaomag/base:2016.03.03.02.28
+FROM takaomag/base:2016.03.08.06.57
 
 ENV \
     X_DOCKER_REPO_NAME=spark \
     X_SPARK_VERSION=1.6.0
 
 RUN \
-    echo "2016-03-03-0" > /dev/null && \
+    echo "2016-03-08-0" > /dev/null && \
     export TERM=dumb && \
     export LANG='en_US.UTF-8' && \
     source /opt/local/bin/x-set-shell-fonts-env.sh && \
@@ -57,7 +57,7 @@ RUN \
     ln -sf spark-${X_SPARK_VERSION} spark && \
     echo -e "${FONT_SUCCESS}[SUCCESS] Installed spark-${X_SPARK_VERSION}${FONT_DEFAULT}" && \
     /opt/local/bin/x-archlinux-remove-unnecessary-files.sh && \
-    pacman-optimize && \
+#    pacman-optimize && \
     rm -f /etc/machine-id
 
 #    mvn -Pyarn -Phadoop-2.4 -Dhadoop.version=2.6.0 -Phive -Phive-thriftserver -DskipTests clean package && \
