@@ -21,6 +21,7 @@ RUN \
     echo -e "${FONT_INFO}[INFO] Installing required packages [${REQUIRED_PACKAGES[@]}]${FONT_DEFAULT}" && \
     sudo -u nobody yaourt -S --needed --noconfirm --noprogressbar "${REQUIRED_PACKAGES[@]}" && \
     echo -e "${FONT_SUCCESS}[SUCCESS] Installed required packages [${REQUIRED_PACKAGES[@]}]${FONT_DEFAULT}" && \
+    export MAVEN_OPTS="-Xmx2g" && \
     echo -e "${FONT_INFO}[INFO] Installing netlib-java=1.1.2${FONT_DEFAULT}" && \
     cd /tmp && \
     git clone https://github.com/fommil/netlib-java.git && \
