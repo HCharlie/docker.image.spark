@@ -50,7 +50,7 @@ RUN \
     curl --fail --silent --location "http://ftp.riken.jp/net/apache/spark/spark-${X_SPARK_VERSION}/spark-${X_SPARK_VERSION}.tgz" | tar xz && \
     cd spark-${X_SPARK_VERSION} && \
     export MAVEN_OPTS="-Xmx2g -XX:MaxPermSize=512M -XX:ReservedCodeCacheSize=512m" && \
-    JAVA_HOME=/usr/lib/jvm/java-8-openjdk ./make-distribution.sh --skip-java-test --with-tachyon --tgz -Pyarn -Phadoop-2.6 -Dhadoop.version=2.7.1 -Phive -Phive-thriftserver -Pnetlib-lgpl && \
+    JAVA_HOME=/usr/lib/jvm/java-8-openjdk ./make-distribution.sh --skip-java-test --with-tachyon --tgz -Pyarn -Phadoop-2.6 -Dhadoop.version=2.7.2 -Phive -Phive-thriftserver -Pnetlib-lgpl && \
     porg --log --package="spark-${X_SPARK_VERSION}" -- mv dist /opt/local/spark-${X_SPARK_VERSION} && \
     porg --log --package="spark-${X_SPARK_VERSION}" -+ mkdir /opt/local/spark-${X_SPARK_VERSION}/dist && \
     porg --log --package="spark-${X_SPARK_VERSION}" -+ mv spark-${X_SPARK_VERSION}*.tgz /opt/local/spark-${X_SPARK_VERSION}/dist/. && \
