@@ -2,11 +2,11 @@
 # - build with netlib-java
 # http://qiita.com/adachij2002/items/b9af506d704434f4f293
 
-FROM takaomag/base:2016.03.08.06.57
+FROM takaomag/base:latest
 
 ENV \
     X_DOCKER_REPO_NAME=spark \
-    X_SPARK_VERSION=1.6.0
+    X_SPARK_VERSION=1.6.1
 
 RUN \
     echo "2016-03-08-0" > /dev/null && \
