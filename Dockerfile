@@ -6,7 +6,9 @@ FROM takaomag/base:latest
 
 ENV \
     X_DOCKER_REPO_NAME=spark \
-    X_SPARK_VERSION=1.6.1
+    X_SPARK_VERSION=1.6.1 \
+    PYSPARK_DRIVER_PYTHON=/opt/local/python-${X_PY3_VERSION}/bin/python3 \
+    PYSPARK_PYTHON=/opt/local/python-${X_PY3_VERSION}/bin/python3
 
 RUN \
     echo "2016-03-08-0" > /dev/null && \
@@ -17,7 +19,7 @@ RUN \
     reflector --latest 100 --verbose --sort score --save /etc/pacman.d/mirrorlist && \
     sudo -u nobody yaourt -Syy && \
     echo -e "${FONT_SUCCESS}[SUCCESS] Updated package database${FONT_DEFAULT}" && \
-    REQUIRED_PACKAGES=("gcc-fortran" "atlas-lapack-base" ) && \
+    REQUIRED_PACKAGES=("gcc-fortran" "atlas-lapack-base") && \
     echo -e "${FONT_INFO}[INFO] Installing required packages [${REQUIRED_PACKAGES[@]}]${FONT_DEFAULT}" && \
     sudo -u nobody yaourt -S --needed --noconfirm --noprogressbar "${REQUIRED_PACKAGES[@]}" && \
     echo -e "${FONT_SUCCESS}[SUCCESS] Installed required packages [${REQUIRED_PACKAGES[@]}]${FONT_DEFAULT}" && \
