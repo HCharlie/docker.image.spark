@@ -11,7 +11,7 @@ ENV \
     PYSPARK_PYTHON=/opt/local/python-${X_PY3_VERSION}/bin/python3
 
 RUN \
-    echo "2016-03-08-0" > /dev/null && \
+    echo "2016-04-23-0" > /dev/null && \
     export TERM=dumb && \
     export LANG='en_US.UTF-8' && \
     source /opt/local/bin/x-set-shell-fonts-env.sh && \
