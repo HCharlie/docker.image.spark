@@ -6,7 +6,7 @@ FROM takaomag/base:2016.06.07.07.30
 
 ENV \
     X_DOCKER_REPO_NAME=spark \
-    X_SPARK_VERSION=1.6.1 \
+    X_SPARK_VERSION=2.0.0-preview \
     PYSPARK_DRIVER_PYTHON=/opt/local/python-${X_PY3_VERSION}/bin/python3 \
     PYSPARK_PYTHON=/opt/local/python-${X_PY3_VERSION}/bin/python3
 
@@ -26,6 +26,8 @@ RUN \
     echo -e "${FONT_INFO}[INFO] Installing required packages [${REQUIRED_PACKAGES[@]}]${FONT_DEFAULT}" && \
     sudo -u nobody yaourt -S --needed --noconfirm --noprogressbar "${REQUIRED_PACKAGES[@]}" && \
     echo -e "${FONT_SUCCESS}[SUCCESS] Installed required packages [${REQUIRED_PACKAGES[@]}]${FONT_DEFAULT}" && \
+    X_SPARK_VERSION_MAJOR=$(cut -d '.' -f 1 <<< ${X_SPARK_VERSION}) && \
+    X_SPARK_VERSION_MINOR=$(cut -d '.' -f 2 <<< ${X_SPARK_VERSION}) && \
     echo -e "${FONT_INFO}[INFO] Installing netlib-java=1.1.2${FONT_DEFAULT}" && \
     cd /tmp && \
     git clone https://github.com/fommil/netlib-java.git && \
@@ -55,7 +57,12 @@ RUN \
     curl --fail --silent --location "http://ftp.riken.jp/net/apache/spark/spark-${X_SPARK_VERSION}/spark-${X_SPARK_VERSION}.tgz" | tar xz && \
     cd spark-${X_SPARK_VERSION} && \
     export MAVEN_OPTS="-Xmx2g -XX:MaxPermSize=512M -XX:ReservedCodeCacheSize=512m" && \
-    JAVA_HOME=/usr/lib/jvm/java-8-openjdk ./make-distribution.sh --skip-java-test --with-tachyon --tgz -Pyarn -Phadoop-2.6 -Dhadoop.version=2.7.2 -Phive -Phive-thriftserver -Pnetlib-lgpl && \
+    [[ -f ./make-distribution.sh ]] && MAKE_DIST_PATH='./make-distribution.sh' || MAKE_DIST_PATH='dev/make-distribution.sh' && \
+    if [[ ${X_SPARK_VERSION_MAJOR} -ge 2 ]];then\
+      JAVA_HOME=/usr/lib/jvm/java-8-openjdk ${MAKE_DIST_PATH} --tgz -Pyarn -Phadoop-2.7 -Dhadoop.version=2.7.2 -Phive -Phive-thriftserver -Pnetlib-lgpl;\
+    else\
+      JAVA_HOME=/usr/lib/jvm/java-8-openjdk ${MAKE_DIST_PATH} --tgz --skip-java-test --with-tachyon -Pyarn -Phadoop-2.6 -Dhadoop.version=2.7.2 -Phive -Phive-thriftserver -Pnetlib-lgpl;\
+    fi; \
     porg --log --package="spark-${X_SPARK_VERSION}" -- mv dist /opt/local/spark-${X_SPARK_VERSION} && \
     porg --log --package="spark-${X_SPARK_VERSION}" -+ mkdir /opt/local/spark-${X_SPARK_VERSION}/dist && \
     porg --log --package="spark-${X_SPARK_VERSION}" -+ mv spark-${X_SPARK_VERSION}*.tgz /opt/local/spark-${X_SPARK_VERSION}/dist/. && \
