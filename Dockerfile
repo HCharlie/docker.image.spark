@@ -6,9 +6,10 @@ FROM takaomag/base:2016.06.07.07.30
 
 ENV \
     X_DOCKER_REPO_NAME=spark \
-    X_SPARK_VERSION=2.0.1-SNAPSHOT \
-    X_SPARK_CLONE_REPO_CMD="git clone -b branch-2.0 git://git.apache.org/spark.git" \
-#    X_SPARK_DOWNLOAD_URI="https://github.com/apache/spark/archive/v2.0.0-rc1.tar.gz" \
+#    X_SPARK_VERSION=2.0.1-SNAPSHOT \
+    X_SPARK_VERSION=2.0.0-rc1 \
+#    X_SPARK_CLONE_REPO_CMD="git clone -b branch-2.0 git://git.apache.org/spark.git" \
+    X_SPARK_DOWNLOAD_URI="https://github.com/apache/spark/archive/v2.0.0-rc1.tar.gz" \
     PYSPARK_DRIVER_PYTHON=/opt/local/python-${X_PY3_VERSION}/bin/python3 \
     PYSPARK_PYTHON=/opt/local/python-${X_PY3_VERSION}/bin/python3
 
