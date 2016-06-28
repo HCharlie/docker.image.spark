@@ -28,6 +28,10 @@ RUN \
     echo -e "${FONT_INFO}[INFO] Installing required packages [${REQUIRED_PACKAGES[@]}]${FONT_DEFAULT}" && \
     sudo -u nobody yaourt -S --needed --noconfirm --noprogressbar "${REQUIRED_PACKAGES[@]}" && \
     echo -e "${FONT_SUCCESS}[SUCCESS] Installed required packages [${REQUIRED_PACKAGES[@]}]${FONT_DEFAULT}" && \
+    REQUIRED_PYTHON_MODULES=("Cython" "numpy" "scipy") && \
+    echo -e "${FONT_INFO}[INFO] Installing required python packages [${REQUIRED_PYTHON_MODULES[@]}]${FONT_DEFAULT}" && \
+    /opt/local/python-${X_PY3_VERSION}/bin/pip3 install --upgrade "${REQUIRED_PYTHON_MODULES[@]}" && \
+    echo -e "${FONT_SUCCESS}[SUCCESS] Installed required packages [${REQUIRED_PYTHON_MODULES[@]}]${FONT_DEFAULT}" && \
     echo -e "${FONT_INFO}[INFO] Installing netlib-java=1.1.2${FONT_DEFAULT}" && \
     cd /var/tmp && \
     git clone https://github.com/fommil/netlib-java.git && \
