@@ -6,9 +6,9 @@ FROM takaomag/base:2016.07.04.04.33
 
 ENV \
     X_DOCKER_REPO_NAME=spark \
-    X_SPARK_VERSION=2.0.1-SNAPSHOT \
-#    X_SPARK_VERSION=2.0.0-rc1 \
-    X_SPARK_CLONE_REPO_CMD="git clone -b branch-2.0 git://git.apache.org/spark.git" \
+#    X_SPARK_VERSION=2.0.1-SNAPSHOT \
+    X_SPARK_VERSION=2.0.0 \
+#    X_SPARK_CLONE_REPO_CMD="git clone -b branch-2.0 git://git.apache.org/spark.git" \
 #    X_SPARK_DOWNLOAD_URI="https://github.com/apache/spark/archive/v2.0.0-rc1.tar.gz" \
     PYSPARK_DRIVER_PYTHON=/opt/local/python-${X_PY3_VERSION}/bin/python3 \
     PYSPARK_PYTHON=/opt/local/python-${X_PY3_VERSION}/bin/python3
@@ -50,20 +50,22 @@ RUN \
     mvn -fn package && \
     cd xbuilds/linux-x86_64 && \
     mvn -fn package && \
-    mv /var/tmp/netlib-java/native_system/xbuilds/linux-x86_64/target/netlib-native_system-linux-x86_64.so /usr/lib/libnetlib-native_system-linux-x86_64.so && \
-    mv /var/tmp/netlib-java/native_ref/xbuilds/linux-x86_64/target/netlib-native_ref-linux-x86_64.so /usr/lib/libnetlib-native_ref-linux-x86_64.so && \
+    porg --log --package="netlib-java-1.1.2" -- mv /var/tmp/netlib-java/native_system/xbuilds/linux-x86_64/target/netlib-native_system-linux-x86_64.so /usr/lib/libnetlib-native_system-linux-x86_64.so && \
+    porg --log --package="netlib-java-1.1.2" -+ -- mv /var/tmp/netlib-java/native_ref/xbuilds/linux-x86_64/target/netlib-native_ref-linux-x86_64.so /usr/lib/libnetlib-native_ref-linux-x86_64.so && \
     ldconfig && \
     cd /var/tmp && \
     rm -rf /var/tmp/netlib-java && \
     echo -e "${FONT_INFO}[INFO] Installed netlib-java=1.1.2${FONT_DEFAULT}" && \
     echo -e "${FONT_INFO}[INFO] Installing spark-${X_SPARK_VERSION}${FONT_DEFAULT}" && \
-    ([ -d /opt/local ] || mkdir -p /opt/local) && cd /var/tmp && \
+    ([ -d /opt/local ] || mkdir -p /opt/local) && \
+    cd /var/tmp && \
     if [[ "${X_SPARK_CLONE_REPO_CMD}" ]];then\
       ${X_SPARK_CLONE_REPO_CMD} && mv spark spark-${X_SPARK_VERSION};\
     elif [[ "${X_SPARK_DOWNLOAD_URI}" ]];then\
-      curl --fail --silent --location "${X_SPARK_DOWNLOAD_URI}" | tar xz;\
+      curl --silent --location --fail --retry 5 "${X_SPARK_DOWNLOAD_URI}" | tar xz;\
     else\
-      curl --fail --silent --location "http://ftp.riken.jp/net/apache/spark/spark-${X_SPARK_VERSION}/spark-${X_SPARK_VERSION}.tgz" | tar xz;\
+      APACHE_CLOSER_MIRROR=$(curl --silent --location --fail --retry 5 --stderr /dev/null "https://www.apache.org/dyn/closer.cgi?as_json=1" | jq -r '.preferred') && \
+      curl --silent --location --fail --retry 5 "${APACHE_CLOSER_MIRROR}spark/spark-${X_SPARK_VERSION}/spark-${X_SPARK_VERSION}.tgz" | tar xz;\
     fi; \
     cd spark-${X_SPARK_VERSION} && \
     # export X_SPARK_VERSION=$(build/mvn help:evaluate -Dexpression=project.version -Pyarn -Phadoop-2.7 -Dhadoop.version=2.7.2 -Phive -Phive-thriftserver -Pnetlib-lgpl 2>/dev/null | grep -v "INFO" | tail -n 1) && \
@@ -77,10 +79,10 @@ RUN \
       ${MAKE_DIST_PATH} --tgz --skip-java-test --with-tachyon -Pyarn -Phadoop-2.6 -Dhadoop.version=2.7.2 -Phive -Phive-thriftserver -Pnetlib-lgpl;\
     fi; \
     porg --log --package="spark-${X_SPARK_VERSION}" -- mv dist /opt/local/spark-${X_SPARK_VERSION} && \
-    porg --log --package="spark-${X_SPARK_VERSION}" -+ mkdir /opt/local/spark-${X_SPARK_VERSION}/dist && \
-    porg --log --package="spark-${X_SPARK_VERSION}" -+ mv spark-${X_SPARK_VERSION}*.tgz /opt/local/spark-${X_SPARK_VERSION}/dist/. && \
+    porg --log --package="spark-${X_SPARK_VERSION}" -+ -- mkdir /opt/local/spark-${X_SPARK_VERSION}/dist && \
+    porg --log --package="spark-${X_SPARK_VERSION}" -+ -- mv spark-${X_SPARK_VERSION}*.tgz /opt/local/spark-${X_SPARK_VERSION}/dist/. && \
     cd /opt/local && \
-    ln -sf spark-${X_SPARK_VERSION} spark && \
+    porg --log --package="spark-${X_SPARK_VERSION}" -+ -- ln -sf spark-${X_SPARK_VERSION} spark && \
     rm -rf /var/tmp/spark-${X_SPARK_VERSION} && \
     echo -e "${FONT_SUCCESS}[SUCCESS] Installed spark-${X_SPARK_VERSION}${FONT_DEFAULT}" && \
     /opt/local/bin/x-archlinux-remove-unnecessary-files.sh && \
