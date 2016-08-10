@@ -26,7 +26,8 @@ RUN \
     echo -e "${FONT_INFO}[INFO] Refreshing package developer keys${FONT_DEFAULT}" && \
     pacman-key --refresh-keys && \
     echo -e "${FONT_SUCCESS}[SUCCESS] Refreshed package developer keys${FONT_DEFAULT}" && \
-    REQUIRED_PACKAGES=("gcc-fortran" "atlas-lapack-base") && \
+#    REQUIRED_PACKAGES=("gcc-fortran" "atlas-lapack-base") && \
+    REQUIRED_PACKAGES=("gcc-fortran" "atlas-lapack") && \
     echo -e "${FONT_INFO}[INFO] Installing required packages [${REQUIRED_PACKAGES[@]}]${FONT_DEFAULT}" && \
     sudo -u nobody yaourt -S --needed --noconfirm --noprogressbar "${REQUIRED_PACKAGES[@]}" && \
     echo -e "${FONT_SUCCESS}[SUCCESS] Installed required packages [${REQUIRED_PACKAGES[@]}]${FONT_DEFAULT}" && \
