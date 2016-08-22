@@ -29,9 +29,11 @@ RUN \
 #    REQUIRED_PACKAGES=("gcc-fortran" "atlas-lapack-base") && \
     REQUIRED_PACKAGES=("gcc-fortran" "atlas-lapack") && \
     echo -e "${FONT_INFO}[INFO] Installing required packages [${REQUIRED_PACKAGES[@]}]${FONT_DEFAULT}" && \
-    export MAKEFLAGS="-j1" && \
+    # export MAKEFLAGS="-j1" && \
+    echo 'MAKEFLAGS="-j1"' >> /etc/makepkg.conf && \
     sudo -E -u nobody yaourt -S --needed --noconfirm --noprogressbar "${REQUIRED_PACKAGES[@]}" && \
-    unset MAKEFLAGS && \
+    # unset MAKEFLAGS && \
+    sed --in-place -e '/^MAKEFLAGS="-j1"$/d' /etc/makepkg.conf && \
     echo -e "${FONT_SUCCESS}[SUCCESS] Installed required packages [${REQUIRED_PACKAGES[@]}]${FONT_DEFAULT}" && \
     REQUIRED_PYTHON_MODULES=("Cython" "numpy" "scipy") && \
     echo -e "${FONT_INFO}[INFO] Installing required python packages [${REQUIRED_PYTHON_MODULES[@]}]${FONT_DEFAULT}" && \
