@@ -30,7 +30,7 @@ RUN \
     REQUIRED_PACKAGES=("gcc-fortran" "atlas-lapack") && \
     echo -e "${FONT_INFO}[INFO] Installing required packages [${REQUIRED_PACKAGES[@]}]${FONT_DEFAULT}" && \
     export MAKEFLAGS="-j1" && \
-    sudo -u nobody yaourt -S --needed --noconfirm --noprogressbar "${REQUIRED_PACKAGES[@]}" && \
+    sudo -E -u nobody yaourt -S --needed --noconfirm --noprogressbar "${REQUIRED_PACKAGES[@]}" && \
     unset MAKEFLAGS && \
     echo -e "${FONT_SUCCESS}[SUCCESS] Installed required packages [${REQUIRED_PACKAGES[@]}]${FONT_DEFAULT}" && \
     REQUIRED_PYTHON_MODULES=("Cython" "numpy" "scipy") && \
