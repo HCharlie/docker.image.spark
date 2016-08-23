@@ -16,6 +16,8 @@ ENV \
 
 RUN \
     echo "2016-05-06-1" > /dev/null && \
+    echo "TESTTEST" && uname -a && \
+    false && \
     export TERM=dumb && \
     export LANG='en_US.UTF-8' && \
     source /opt/local/bin/x-set-shell-fonts-env.sh && \
