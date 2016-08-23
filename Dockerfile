@@ -33,7 +33,7 @@ RUN \
     echo -e "${FONT_SUCCESS}[SUCCESS] Refreshed package developer keys${FONT_DEFAULT}" && \
 #    REQUIRED_PACKAGES=("gcc-fortran" "atlas-lapack-base") && \
 #    REQUIRED_PACKAGES=("gcc-fortran" "atlas-lapack") && \
-    REQUIRED_PACKAGES=("gcc-fortran" "blas" "lapack") && \
+    REQUIRED_PACKAGES=("gcc-fortran" "blas" "cblas" "lapack") && \
     echo -e "${FONT_INFO}[INFO] Installing required packages [${REQUIRED_PACKAGES[@]}]${FONT_DEFAULT}" && \
     sudo -u nobody yaourt -S --needed --noconfirm --noprogressbar "${REQUIRED_PACKAGES[@]}" && \
     echo -e "${FONT_SUCCESS}[SUCCESS] Installed required packages [${REQUIRED_PACKAGES[@]}]${FONT_DEFAULT}" && \
@@ -58,8 +58,6 @@ RUN \
     mvn -fn package && \
     cd xbuilds/linux-x86_64 && \
     mvn -fn package && \
-    ls -al /var/tmp/netlib-java/native_system/xbuilds/linux-x86_64/target/ && \
-    sync && sync && \
     porg --log --package="netlib-java-1.1.2" -- mv /var/tmp/netlib-java/native_system/xbuilds/linux-x86_64/target/netlib-native_system-linux-x86_64.so /usr/lib/libnetlib-native_system-linux-x86_64.so && \
     porg --log --package="netlib-java-1.1.2" -+ -- mv /var/tmp/netlib-java/native_ref/xbuilds/linux-x86_64/target/netlib-native_ref-linux-x86_64.so /usr/lib/libnetlib-native_ref-linux-x86_64.so && \
     ldconfig && \
