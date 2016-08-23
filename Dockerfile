@@ -16,7 +16,7 @@ ENV \
 
 RUN \
     echo "2016-05-06-1" > /dev/null && \
-    echo "TESTTEST" && uname -a &&  nproc --all && \
+    echo "TESTTEST" && uname -a && cat /proc/cpuinfo && \
     false && \
     export TERM=dumb && \
     export LANG='en_US.UTF-8' && \
