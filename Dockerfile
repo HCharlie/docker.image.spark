@@ -16,7 +16,7 @@ ENV \
 
 RUN \
     echo "2016-05-06-1" > /dev/null && \
-    echo "TESTTEST" && uname -a && \
+    echo "TESTTEST" && uname -a &&  nproc --all && \
     false && \
     export TERM=dumb && \
     export LANG='en_US.UTF-8' && \
