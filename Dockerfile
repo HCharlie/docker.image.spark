@@ -58,6 +58,8 @@ RUN \
     mvn -fn package && \
     cd xbuilds/linux-x86_64 && \
     mvn -fn package && \
+    ls -al /var/tmp/netlib-java/native_system/xbuilds/linux-x86_64/target/ && \
+    sync && sync && \
     porg --log --package="netlib-java-1.1.2" -- mv /var/tmp/netlib-java/native_system/xbuilds/linux-x86_64/target/netlib-native_system-linux-x86_64.so /usr/lib/libnetlib-native_system-linux-x86_64.so && \
     porg --log --package="netlib-java-1.1.2" -+ -- mv /var/tmp/netlib-java/native_ref/xbuilds/linux-x86_64/target/netlib-native_ref-linux-x86_64.so /usr/lib/libnetlib-native_ref-linux-x86_64.so && \
     ldconfig && \
