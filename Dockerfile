@@ -2,6 +2,11 @@
 # - build with netlib-java
 # http://qiita.com/adachij2002/items/b9af506d704434f4f293
 
+# OpenBLAS and multi-thread problem on Docker automated-build
+# http://stackoverflow.com/questions/27919866/docker-images-with-architecture-optimisation
+# http://stackoverflow.com/questions/27301373/hopefully-quick-parallel-optimal-lapack-routine-gfortran-questions
+# http://qiita.com/_akisato/items/d5de60e38b5a69387bde
+
 FROM takaomag/base:2016.08.10.01.07
 
 ENV \
@@ -16,8 +21,6 @@ ENV \
 
 RUN \
     echo "2016-05-06-1" > /dev/null && \
-    echo "TESTTEST" && uname -a && cat /proc/cpuinfo && \
-    false && \
     export TERM=dumb && \
     export LANG='en_US.UTF-8' && \
     source /opt/local/bin/x-set-shell-fonts-env.sh && \
@@ -29,13 +32,10 @@ RUN \
     pacman-key --refresh-keys && \
     echo -e "${FONT_SUCCESS}[SUCCESS] Refreshed package developer keys${FONT_DEFAULT}" && \
 #    REQUIRED_PACKAGES=("gcc-fortran" "atlas-lapack-base") && \
-    REQUIRED_PACKAGES=("gcc-fortran" "atlas-lapack") && \
+#    REQUIRED_PACKAGES=("gcc-fortran" "atlas-lapack") && \
+    REQUIRED_PACKAGES=("gcc-fortran" "blas" "lapack") && \
     echo -e "${FONT_INFO}[INFO] Installing required packages [${REQUIRED_PACKAGES[@]}]${FONT_DEFAULT}" && \
-    # export MAKEFLAGS="-j1" && \
-    echo 'MAKEFLAGS="-j1"' >> /etc/makepkg.conf && \
-    sudo -E -u nobody yaourt -S --needed --noconfirm --noprogressbar "${REQUIRED_PACKAGES[@]}" && \
-    # unset MAKEFLAGS && \
-    sed --in-place -e '/^MAKEFLAGS="-j1"$/d' /etc/makepkg.conf && \
+    sudo -u nobody yaourt -S --needed --noconfirm --noprogressbar "${REQUIRED_PACKAGES[@]}" && \
     echo -e "${FONT_SUCCESS}[SUCCESS] Installed required packages [${REQUIRED_PACKAGES[@]}]${FONT_DEFAULT}" && \
     REQUIRED_PYTHON_MODULES=("Cython" "numpy" "scipy") && \
     echo -e "${FONT_INFO}[INFO] Installing required python packages [${REQUIRED_PYTHON_MODULES[@]}]${FONT_DEFAULT}" && \
