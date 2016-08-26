@@ -196,3 +196,10 @@ pyvenv.cfg
 pip-selfcheck.json
 
 
+#### JavaDB
+derby.log
+
+
+#### Hive
+metastore_db/
+

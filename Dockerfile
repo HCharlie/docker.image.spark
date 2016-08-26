@@ -2,12 +2,7 @@
 # - build with netlib-java
 # http://qiita.com/adachij2002/items/b9af506d704434f4f293
 
-# OpenBLAS and multi-thread problem on Docker automated-build
-# http://stackoverflow.com/questions/27919866/docker-images-with-architecture-optimisation
-# http://stackoverflow.com/questions/27301373/hopefully-quick-parallel-optimal-lapack-routine-gfortran-questions
-# http://qiita.com/_akisato/items/d5de60e38b5a69387bde
-
-FROM takaomag/base:2016.08.10.01.07
+FROM takaomag/sci.base-0:2016.08.10.01.07
 
 ENV \
     X_DOCKER_REPO_NAME=spark \
@@ -31,39 +26,6 @@ RUN \
     echo -e "${FONT_INFO}[INFO] Refreshing package developer keys${FONT_DEFAULT}" && \
     pacman-key --refresh-keys && \
     echo -e "${FONT_SUCCESS}[SUCCESS] Refreshed package developer keys${FONT_DEFAULT}" && \
-#    REQUIRED_PACKAGES=("gcc-fortran" "atlas-lapack-base") && \
-#    REQUIRED_PACKAGES=("gcc-fortran" "atlas-lapack") && \
-    REQUIRED_PACKAGES=("gcc-fortran" "blas" "cblas" "lapack") && \
-    echo -e "${FONT_INFO}[INFO] Installing required packages [${REQUIRED_PACKAGES[@]}]${FONT_DEFAULT}" && \
-    sudo -u nobody yaourt -S --needed --noconfirm --noprogressbar "${REQUIRED_PACKAGES[@]}" && \
-    echo -e "${FONT_SUCCESS}[SUCCESS] Installed required packages [${REQUIRED_PACKAGES[@]}]${FONT_DEFAULT}" && \
-    REQUIRED_PYTHON_MODULES=("Cython" "numpy" "scipy") && \
-    echo -e "${FONT_INFO}[INFO] Installing required python packages [${REQUIRED_PYTHON_MODULES[@]}]${FONT_DEFAULT}" && \
-    /opt/local/python-${X_PY3_VERSION}/bin/pip3 install --upgrade "${REQUIRED_PYTHON_MODULES[@]}" && \
-    echo -e "${FONT_SUCCESS}[SUCCESS] Installed required python packages [${REQUIRED_PYTHON_MODULES[@]}]${FONT_DEFAULT}" && \
-    echo -e "${FONT_INFO}[INFO] Installing netlib-java=1.1.2${FONT_DEFAULT}" && \
-    cd /var/tmp && \
-    git clone https://github.com/fommil/netlib-java.git && \
-    cd netlib-java && \
-    git checkout -b 1.1.2 refs/tags/1.1.2 && \
-    sed -i "s/1.2-SNAPSHOT/1.1.2/g" `grep -l 1.2-SNAPSHOT pom.xml perf/pom.xml legacy/pom.xml` && \
-    sed -i "s/1.1.1/1.1.2/g" `grep -l 1.1.1 generator/pom.xml core/pom.xml all/pom.xml` && \
-    sed -i "s/1.2-SNAPSHOT/1.1/g" `grep -rl --include='pom.xml' 1.2-SNAPSHOT native_ref native_system` && \
-    mvn -fn package && \
-    cd native_system && \
-    mvn -fn package && \
-    cd xbuilds/linux-x86_64 && \
-    mvn -fn package && \
-    cd ../../../native_ref && \
-    mvn -fn package && \
-    cd xbuilds/linux-x86_64 && \
-    mvn -fn package && \
-    porg --log --package="netlib-java-1.1.2" -- mv /var/tmp/netlib-java/native_system/xbuilds/linux-x86_64/target/netlib-native_system-linux-x86_64.so /usr/lib/libnetlib-native_system-linux-x86_64.so && \
-    porg --log --package="netlib-java-1.1.2" -+ -- mv /var/tmp/netlib-java/native_ref/xbuilds/linux-x86_64/target/netlib-native_ref-linux-x86_64.so /usr/lib/libnetlib-native_ref-linux-x86_64.so && \
-    ldconfig && \
-    cd /var/tmp && \
-    rm -rf /var/tmp/netlib-java && \
-    echo -e "${FONT_INFO}[INFO] Installed netlib-java=1.1.2${FONT_DEFAULT}" && \
     echo -e "${FONT_INFO}[INFO] Installing spark-${X_SPARK_VERSION}${FONT_DEFAULT}" && \
     ([ -d /opt/local ] || mkdir -p /opt/local) && \
     cd /var/tmp && \
