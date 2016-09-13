@@ -11,6 +11,7 @@ ENV \
 #    X_SPARK_CLONE_REPO_CMD="git clone -b branch-2.0 git://git.apache.org/spark.git" \
 #    X_SPARK_DOWNLOAD_URI="https://github.com/apache/spark/archive/v2.0.0-rc1.tar.gz" \
     X_SPARK_DOWNLOAD_URI="http://ftp.riken.jp/net/apache/spark/spark-2.0.0/spark-2.0.0.tgz" \
+    SPARK_HOME=/opt/local/spark \
     PYSPARK_DRIVER_PYTHON=/opt/local/python-${X_PY3_VERSION}/bin/python3 \
     PYSPARK_PYTHON=/opt/local/python-${X_PY3_VERSION}/bin/python3 \
     SPARK_EXECUTOR_URI=/opt/local/spark/dist/spark-2.0.0-bin-${X_HADOOP_VERSION}.tgz
@@ -61,3 +62,14 @@ RUN \
     rm -f /etc/machine-id
 
 #    mvn -Pyarn -Phadoop-2.4 -Dhadoop.version=2.6.0 -Phive -Phive-thriftserver -DskipTests clean package && \
+# envs
+# SPARK_HOME
+# SPARK_CONF_DIR
+# PYSPARK_PYTHON
+# PYSPARK_DRIVER_PYTHON
+# SPARKR_DRIVER_R
+# SPARK_LOCAL_IP
+# SPARK_PUBLIC_DNS
+# SPARK_LOCAL_DIRS (standalone or mesos)
+# LOCAL_DIRS (yarn)
+# SPARK_EXECUTOR_URK (for mesos)
