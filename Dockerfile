@@ -14,7 +14,7 @@ ENV \
     SPARK_HOME=/opt/local/spark \
     PYSPARK_DRIVER_PYTHON=/opt/local/python-${X_PY3_VERSION}/bin/python3 \
     PYSPARK_PYTHON=/opt/local/python-${X_PY3_VERSION}/bin/python3 \
-    SPARK_EXECUTOR_URI=/opt/local/spark/dist/spark-2.0.0-bin-${X_HADOOP_VERSION}.tgz
+    SPARK_EXECUTOR_URI=file:///opt/local/spark/dist/spark-2.0.0-bin-${X_HADOOP_VERSION}.tgz
 
 RUN \
     echo "2016-05-06-1" > /dev/null && \
@@ -60,6 +60,9 @@ RUN \
     /opt/local/bin/x-archlinux-remove-unnecessary-files.sh && \
 #    pacman-optimize && \
     rm -f /etc/machine-id
+
+# spark.mesos.executor.docker.image assumes the default working directory of the container to be inside $SPARK_HOME.
+WORKDIR /opt/local/spark
 
 #    mvn -Pyarn -Phadoop-2.4 -Dhadoop.version=2.6.0 -Phive -Phive-thriftserver -DskipTests clean package && \
 # envs
