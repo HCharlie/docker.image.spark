@@ -2,7 +2,7 @@
 # - build with netlib-java
 # http://qiita.com/adachij2002/items/b9af506d704434f4f293
 
-FROM takaomag/openblas:release-0.2.19-2016.09.16.02.27
+FROM takaomag/openblas:release-0.2.19-2016.10.08.05.05
 
 ENV \
     X_DOCKER_REPO_NAME=spark \
@@ -10,7 +10,7 @@ ENV \
     X_SPARK_VERSION=2.0.1 \
 #    X_SPARK_CLONE_REPO_CMD="git clone -b branch-2.0 git://git.apache.org/spark.git" \
 #    X_SPARK_DOWNLOAD_URI="https://github.com/apache/spark/archive/v2.0.0-rc1.tar.gz" \
-    X_SPARK_DOWNLOAD_URI="http://ftp.riken.jp/net/apache/spark/spark-2.0.1/spark-2.0.1.tgz" \
+#    X_SPARK_DOWNLOAD_URI="http://ftp.riken.jp/net/apache/spark/spark-2.0.1/spark-2.0.1.tgz" \
     SPARK_HOME=/opt/local/spark \
     PYSPARK_DRIVER_PYTHON=/opt/local/python-${X_PY3_VERSION}/bin/python3 \
     PYSPARK_PYTHON=/opt/local/python-${X_PY3_VERSION}/bin/python3 \
