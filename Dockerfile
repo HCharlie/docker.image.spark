@@ -48,7 +48,7 @@ RUN \
       curl --silent --location --fail --retry 5 "${APACHE_CLOSER_MIRROR}spark/spark-${X_SPARK_VERSION}/spark-${X_SPARK_VERSION}.tgz" | tar xz;\
     fi; \
     cd spark-${X_SPARK_VERSION} && \
-    sed -e 's|log4j.rootCategory=INFO|log4j.rootCategory=WARN|g' conf/log4j.properties.template > conf/log4j.properties && \
+    sed --in-place -e 's|log4j\.rootCategory=INFO|log4\.rootCategory=WARN|g' conf/log4j.properties.template && \
     # export X_SPARK_VERSION=$(build/mvn help:evaluate -Dexpression=project.version -Pyarn -Phadoop-2.7 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver -Pnetlib-lgpl 2>/dev/null | grep -v "INFO" | tail -n 1) && \
     X_SPARK_VERSION_MAJOR=$(cut -d '.' -f 1 <<< ${X_SPARK_VERSION}) && \
     [[ -f ./make-distribution.sh ]] && MAKE_DIST_PATH='./make-distribution.sh' || MAKE_DIST_PATH='dev/make-distribution.sh' && \
@@ -59,6 +59,12 @@ RUN \
     else\
       ${MAKE_DIST_PATH} --tgz --skip-java-test --with-tachyon -Pyarn -Phadoop-2.6 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver -Pnetlib-lgpl;\
     fi; \
+    cp -ap conf/log4j.properties.template conf/log4j.properties && \
+    tar xvzf dist/spark-${X_SPARK_VERSION}-bin-${X_HADOOP_VERSION}.tgz -C dist/. && \
+    rm dist/spark-${X_SPARK_VERSION}-bin-${X_HADOOP_VERSION}.tgz && \
+    cp -ap dist/spark-${X_SPARK_VERSION}-bin-${X_HADOOP_VERSION}/conf/log4j.properties.template dist/spark-${X_SPARK_VERSION}-bin-${X_HADOOP_VERSION}/conf/log4j.properties && \
+    tar -C dist -cvzf dist/spark-${X_SPARK_VERSION}-bin-${X_HADOOP_VERSION}.tgz spark-${X_SPARK_VERSION}-bin-${X_HADOOP_VERSION} && \
+    rm -rf dist/spark-${X_SPARK_VERSION}-bin-${X_HADOOP_VERSION} && \
     porg --log --package="spark-${X_SPARK_VERSION}" -- mv dist /opt/local/spark-${X_SPARK_VERSION} && \
     porg --log --package="spark-${X_SPARK_VERSION}" -+ -- mkdir /opt/local/spark-${X_SPARK_VERSION}/dist && \
     porg --log --package="spark-${X_SPARK_VERSION}" -+ -- mv spark-${X_SPARK_VERSION}*.tgz /opt/local/spark-${X_SPARK_VERSION}/dist/. && \
