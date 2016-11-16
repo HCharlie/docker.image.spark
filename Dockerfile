@@ -48,6 +48,7 @@ RUN \
       curl --silent --location --fail --retry 5 "${APACHE_CLOSER_MIRROR}spark/spark-${X_SPARK_VERSION}/spark-${X_SPARK_VERSION}.tgz" | tar xz;\
     fi; \
     cd spark-${X_SPARK_VERSION} && \
+    sed -e 's|log4j.rootCategory=INFO|log4j.rootCategory=WARN|g' conf/log4j.properties.template > conf/log4j.properties && \
     # export X_SPARK_VERSION=$(build/mvn help:evaluate -Dexpression=project.version -Pyarn -Phadoop-2.7 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver -Pnetlib-lgpl 2>/dev/null | grep -v "INFO" | tail -n 1) && \
     X_SPARK_VERSION_MAJOR=$(cut -d '.' -f 1 <<< ${X_SPARK_VERSION}) && \
     [[ -f ./make-distribution.sh ]] && MAKE_DIST_PATH='./make-distribution.sh' || MAKE_DIST_PATH='dev/make-distribution.sh' && \
