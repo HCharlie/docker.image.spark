@@ -7,14 +7,14 @@ FROM takaomag/openblas:release-0.2.19-2016.11.07.01.09
 ENV \
     X_DOCKER_REPO_NAME=spark \
 #    X_SPARK_VERSION=2.0.1-SNAPSHOT \
-    X_SPARK_VERSION=2.0.1 \
+    X_SPARK_VERSION=2.0.2 \
 #    X_SPARK_CLONE_REPO_CMD="git clone -b branch-2.0 git://git.apache.org/spark.git" \
 #    X_SPARK_DOWNLOAD_URI="https://github.com/apache/spark/archive/v2.0.0-rc1.tar.gz" \
 #    X_SPARK_DOWNLOAD_URI="http://ftp.riken.jp/net/apache/spark/spark-2.0.1/spark-2.0.1.tgz" \
     SPARK_HOME=/opt/local/spark \
     PYSPARK_DRIVER_PYTHON=/opt/local/python-${X_PY3_VERSION}/bin/python3 \
     PYSPARK_PYTHON=/opt/local/python-${X_PY3_VERSION}/bin/python3 \
-    SPARK_EXECUTOR_URI=file:///opt/local/spark/dist/spark-2.0.1-bin-${X_HADOOP_VERSION}.tgz
+    SPARK_EXECUTOR_URI=file:///opt/local/spark/dist/spark-2.0.2-bin-${X_HADOOP_VERSION}.tgz
 
 RUN \
     echo "2016-05-06-1" > /dev/null && \
