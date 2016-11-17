@@ -60,11 +60,12 @@ RUN \
       ${MAKE_DIST_PATH} --tgz --skip-java-test --with-tachyon -Pyarn -Phadoop-2.6 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver -Pnetlib-lgpl;\
     fi; \
     cp -ap conf/log4j.properties.template conf/log4j.properties && \
-    tar xvzf dist/spark-${X_SPARK_VERSION}-bin-${X_HADOOP_VERSION}.tgz -C dist/. && \
-    rm dist/spark-${X_SPARK_VERSION}-bin-${X_HADOOP_VERSION}.tgz && \
-    cp -ap dist/spark-${X_SPARK_VERSION}-bin-${X_HADOOP_VERSION}/conf/log4j.properties.template dist/spark-${X_SPARK_VERSION}-bin-${X_HADOOP_VERSION}/conf/log4j.properties && \
-    tar -C dist -cvzf dist/spark-${X_SPARK_VERSION}-bin-${X_HADOOP_VERSION}.tgz spark-${X_SPARK_VERSION}-bin-${X_HADOOP_VERSION} && \
-    rm -rf dist/spark-${X_SPARK_VERSION}-bin-${X_HADOOP_VERSION} && \
+    mkdir x_mago_dist && \
+    tar xvzf spark-${X_SPARK_VERSION}-bin-${X_HADOOP_VERSION}.tgz -C x_mago_dist/. && \
+    rm spark-${X_SPARK_VERSION}-bin-${X_HADOOP_VERSION}.tgz && \
+    cp -ap x_mago_dist/spark-${X_SPARK_VERSION}-bin-${X_HADOOP_VERSION}/conf/log4j.properties.template x_mago_dist/spark-${X_SPARK_VERSION}-bin-${X_HADOOP_VERSION}/conf/log4j.properties && \
+    tar -C x_mago_dist -cvzf spark-${X_SPARK_VERSION}-bin-${X_HADOOP_VERSION}.tgz spark-${X_SPARK_VERSION}-bin-${X_HADOOP_VERSION} && \
+    rm -rf x_mago_dist && \
     porg --log --package="spark-${X_SPARK_VERSION}" -- mv dist /opt/local/spark-${X_SPARK_VERSION} && \
     porg --log --package="spark-${X_SPARK_VERSION}" -+ -- mkdir /opt/local/spark-${X_SPARK_VERSION}/dist && \
     porg --log --package="spark-${X_SPARK_VERSION}" -+ -- mv spark-${X_SPARK_VERSION}*.tgz /opt/local/spark-${X_SPARK_VERSION}/dist/. && \
