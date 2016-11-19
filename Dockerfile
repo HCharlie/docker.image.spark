@@ -59,7 +59,7 @@ RUN \
     else\
       ${MAKE_DIST_PATH} --tgz --skip-java-test --with-tachyon -Pyarn -Phadoop-2.6 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver -Pnetlib-lgpl;\
     fi; \
-    cp -ap conf/log4j.properties.template conf/log4j.properties && \
+    cp -ap dist/conf/log4j.properties.template dist/conf/log4j.properties && \
     mkdir x_mago_dist && \
     tar xvzf spark-${X_SPARK_VERSION}-bin-${X_HADOOP_VERSION}.tgz -C x_mago_dist/. && \
     rm spark-${X_SPARK_VERSION}-bin-${X_HADOOP_VERSION}.tgz && \
