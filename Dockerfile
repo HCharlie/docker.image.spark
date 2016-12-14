@@ -2,19 +2,19 @@
 # - build with netlib-java
 # http://qiita.com/adachij2002/items/b9af506d704434f4f293
 
-FROM takaomag/openblas:release-0.2.19-2016.11.07.01.09
+FROM takaomag/openblas:release-0.2.19-2016.12.14.02.21
 
 ENV \
     X_DOCKER_REPO_NAME=spark \
-#    X_SPARK_VERSION=2.0.1-SNAPSHOT \
-    X_SPARK_VERSION=2.0.2 \
+    X_SPARK_VERSION=2.1.0-rc2 \
+#    X_SPARK_VERSION=2.0.2 \
 #    X_SPARK_CLONE_REPO_CMD="git clone -b branch-2.0 git://git.apache.org/spark.git" \
-#    X_SPARK_DOWNLOAD_URI="https://github.com/apache/spark/archive/v2.0.0-rc1.tar.gz" \
+    X_SPARK_DOWNLOAD_URI="https://github.com/apache/spark/archive/v2.1.0-rc2.tar.gz" \
 #    X_SPARK_DOWNLOAD_URI="http://ftp.riken.jp/net/apache/spark/spark-2.0.1/spark-2.0.1.tgz" \
     SPARK_HOME=/opt/local/spark \
     PYSPARK_DRIVER_PYTHON=/opt/local/python-${X_PY3_VERSION}/bin/python3 \
     PYSPARK_PYTHON=/opt/local/python-${X_PY3_VERSION}/bin/python3 \
-    SPARK_EXECUTOR_URI=file:///opt/local/spark/dist/spark-2.0.2-bin-${X_HADOOP_VERSION}.tgz
+    SPARK_EXECUTOR_URI=file:///opt/local/spark/dist/spark-2.1.0-bin-${X_HADOOP_VERSION}.tgz
 
 RUN \
     echo "2016-05-06-1" > /dev/null && \
@@ -49,26 +49,26 @@ RUN \
     fi; \
     cd spark-${X_SPARK_VERSION} && \
     sed --in-place -e 's|log4j\.rootCategory=INFO|log4\.rootCategory=WARN|g' conf/log4j.properties.template && \
-    # export X_SPARK_VERSION=$(build/mvn help:evaluate -Dexpression=project.version -Pyarn -Phadoop-2.7 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver -Pnetlib-lgpl 2>/dev/null | grep -v "INFO" | tail -n 1) && \
-    X_SPARK_VERSION_MAJOR=$(cut -d '.' -f 1 <<< ${X_SPARK_VERSION}) && \
+    export X_INTERNAL_SPARK_VERSION=$(build/mvn help:evaluate -Dexpression=project.version -Pyarn -Phadoop-2.7 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver -Pnetlib-lgpl 2>/dev/null | grep -v "INFO" | tail -n 1) && \
+    X_INTERNAL_SPARK_VERSION_MAJOR=$(cut -d '.' -f 1 <<< ${X_INTERNAL_SPARK_VERSION}) && \
     [[ -f ./make-distribution.sh ]] && MAKE_DIST_PATH='./make-distribution.sh' || MAKE_DIST_PATH='dev/make-distribution.sh' && \
     export JAVA_HOME=/usr/lib/jvm/java-8-openjdk && \
     export MAVEN_OPTS="-Xmx2g -XX:MaxPermSize=512M -XX:ReservedCodeCacheSize=512m" && \
-    if [[ ${X_SPARK_VERSION_MAJOR} -ge 2 ]];then\
+    if [[ ${X_INTERNAL_SPARK_VERSION_MAJOR} -ge 2 ]];then\
       ${MAKE_DIST_PATH} --tgz -Pyarn -Phadoop-2.7 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver -Pnetlib-lgpl;\
     else\
       ${MAKE_DIST_PATH} --tgz --skip-java-test --with-tachyon -Pyarn -Phadoop-2.6 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver -Pnetlib-lgpl;\
     fi; \
     cp -ap dist/conf/log4j.properties.template dist/conf/log4j.properties && \
     mkdir x_mago_dist && \
-    tar xvzf spark-${X_SPARK_VERSION}-bin-${X_HADOOP_VERSION}.tgz -C x_mago_dist/. && \
-    rm spark-${X_SPARK_VERSION}-bin-${X_HADOOP_VERSION}.tgz && \
-    cp -ap x_mago_dist/spark-${X_SPARK_VERSION}-bin-${X_HADOOP_VERSION}/conf/log4j.properties.template x_mago_dist/spark-${X_SPARK_VERSION}-bin-${X_HADOOP_VERSION}/conf/log4j.properties && \
-    tar -C x_mago_dist -cvzf spark-${X_SPARK_VERSION}-bin-${X_HADOOP_VERSION}.tgz spark-${X_SPARK_VERSION}-bin-${X_HADOOP_VERSION} && \
+    tar xvzf spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}.tgz -C x_mago_dist/. && \
+    rm spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}.tgz && \
+    cp -ap x_mago_dist/spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}/conf/log4j.properties.template x_mago_dist/spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}/conf/log4j.properties && \
+    tar -C x_mago_dist -cvzf spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}.tgz spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION} && \
     rm -rf x_mago_dist && \
     porg --log --package="spark-${X_SPARK_VERSION}" -- mv dist /opt/local/spark-${X_SPARK_VERSION} && \
     porg --log --package="spark-${X_SPARK_VERSION}" -+ -- mkdir /opt/local/spark-${X_SPARK_VERSION}/dist && \
-    porg --log --package="spark-${X_SPARK_VERSION}" -+ -- mv spark-${X_SPARK_VERSION}*.tgz /opt/local/spark-${X_SPARK_VERSION}/dist/. && \
+    porg --log --package="spark-${X_SPARK_VERSION}" -+ -- mv spark-${X_INTERNAL_SPARK_VERSION}*.tgz /opt/local/spark-${X_SPARK_VERSION}/dist/. && \
     cd /opt/local && \
     porg --log --package="spark-${X_SPARK_VERSION}" -+ -- ln -sf spark-${X_SPARK_VERSION} spark && \
     rm -rf /var/tmp/spark-${X_SPARK_VERSION} && \
