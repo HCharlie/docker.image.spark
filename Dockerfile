@@ -6,10 +6,10 @@ FROM takaomag/openblas:release-0.2.19-2016.12.14.02.21
 
 ENV \
     X_DOCKER_REPO_NAME=spark \
-    X_SPARK_VERSION=2.1.0-rc2 \
+    X_SPARK_VERSION=2.1.0-rc5 \
 #    X_SPARK_VERSION=2.0.2 \
 #    X_SPARK_CLONE_REPO_CMD="git clone -b branch-2.0 git://git.apache.org/spark.git" \
-    X_SPARK_DOWNLOAD_URI="https://github.com/apache/spark/archive/v2.1.0-rc2.tar.gz" \
+    X_SPARK_DOWNLOAD_URI="https://github.com/apache/spark/archive/v2.1.0-rc5.tar.gz" \
 #    X_SPARK_DOWNLOAD_URI="http://ftp.riken.jp/net/apache/spark/spark-2.0.1/spark-2.0.1.tgz" \
     SPARK_HOME=/opt/local/spark \
     PYSPARK_DRIVER_PYTHON=/opt/local/python-${X_PY3_VERSION}/bin/python3 \
