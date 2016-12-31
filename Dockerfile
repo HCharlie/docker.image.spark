@@ -6,14 +6,17 @@ FROM takaomag/openblas:release-0.2.19-2016.12.14.02.21
 
 ENV \
     X_DOCKER_REPO_NAME=spark \
-    X_SPARK_VERSION=2.1.0-rc5 \
+    X_SPARK_VERSION=2.1.0 \
+#    X_SPARK_VERSION=2.1.0-rc5 \
 #    X_SPARK_VERSION=2.0.2 \
 #    X_SPARK_CLONE_REPO_CMD="git clone -b branch-2.0 git://git.apache.org/spark.git" \
-    X_SPARK_DOWNLOAD_URI="https://github.com/apache/spark/archive/v2.1.0-rc5.tar.gz" \
+#    X_SPARK_DOWNLOAD_URI="https://github.com/apache/spark/archive/v2.1.0-rc5.tar.gz" \
 #    X_SPARK_DOWNLOAD_URI="http://ftp.riken.jp/net/apache/spark/spark-2.0.1/spark-2.0.1.tgz" \
     SPARK_HOME=/opt/local/spark \
-    PYSPARK_DRIVER_PYTHON=/opt/local/python-${X_PY3_VERSION}/bin/python3 \
-    PYSPARK_PYTHON=/opt/local/python-${X_PY3_VERSION}/bin/python3 \
+#    PYSPARK_DRIVER_PYTHON=/opt/local/python-${X_PY3_VERSION}/bin/python3 \
+    PYSPARK_DRIVER_PYTHON=/opt/local/python-3/bin/python3 \
+#    PYSPARK_PYTHON=/opt/local/python-${X_PY3_VERSION}/bin/python3 \
+    PYSPARK_PYTHON=/opt/local/python-3/bin/python3 \
     SPARK_EXECUTOR_URI=file:///opt/local/spark/dist/spark-2.1.0-bin-${X_HADOOP_VERSION}.tgz
 
 RUN \
@@ -53,9 +56,10 @@ RUN \
     X_INTERNAL_SPARK_VERSION_MAJOR=$(cut -d '.' -f 1 <<< ${X_INTERNAL_SPARK_VERSION}) && \
     [[ -f ./make-distribution.sh ]] && MAKE_DIST_PATH='./make-distribution.sh' || MAKE_DIST_PATH='dev/make-distribution.sh' && \
     export JAVA_HOME=/usr/lib/jvm/java-8-openjdk && \
-    export MAVEN_OPTS="-Xmx2g -XX:MaxPermSize=512M -XX:ReservedCodeCacheSize=512m" && \
+    # export MAVEN_OPTS="-Xmx2g -XX:MaxPermSize=512M -XX:ReservedCodeCacheSize=512m" && \
+    export MAVEN_OPTS="-Xmx2g -XX:ReservedCodeCacheSize=512m" && \
     if [[ ${X_INTERNAL_SPARK_VERSION_MAJOR} -ge 2 ]];then\
-      ${MAKE_DIST_PATH} --tgz -Pyarn -Phadoop-2.7 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver -Pnetlib-lgpl;\
+      ${MAKE_DIST_PATH} --tgz -Pyarn -Phadoop-2.7 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver -Pmesos -Pnetlib-lgpl;\
     else\
       ${MAKE_DIST_PATH} --tgz --skip-java-test --with-tachyon -Pyarn -Phadoop-2.6 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver -Pnetlib-lgpl;\
     fi; \
@@ -64,8 +68,16 @@ RUN \
     tar xvzf spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}.tgz -C x_mago_dist/. && \
     rm spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}.tgz && \
     cp -ap x_mago_dist/spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}/conf/log4j.properties.template x_mago_dist/spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}/conf/log4j.properties && \
+    cd x_mago_dist/spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}/python && \
+    /opt/local/python-3/bin/python3 setup.py sdist && \
+    /opt/local/python-3/bin/python3 setup.py bdist_wheel && \
+    cd ../../.. && \
     tar -C x_mago_dist -cvzf spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}.tgz spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION} && \
     rm -rf x_mago_dist && \
+    cd dist/python && \
+    /opt/local/python-3/bin/python3 setup.py sdist && \
+    /opt/local/python-3/bin/python3 setup.py bdist_wheel && \
+    cd ../.. && \
     porg --log --package="spark-${X_SPARK_VERSION}" -- mv dist /opt/local/spark-${X_SPARK_VERSION} && \
     porg --log --package="spark-${X_SPARK_VERSION}" -+ -- mkdir /opt/local/spark-${X_SPARK_VERSION}/dist && \
     porg --log --package="spark-${X_SPARK_VERSION}" -+ -- mv spark-${X_INTERNAL_SPARK_VERSION}*.tgz /opt/local/spark-${X_SPARK_VERSION}/dist/. && \
