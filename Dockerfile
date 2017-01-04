@@ -2,7 +2,7 @@
 # - build with netlib-java
 # http://qiita.com/adachij2002/items/b9af506d704434f4f293
 
-FROM takaomag/openblas:release-0.2.19-2016.12.14.02.21
+FROM takaomag/openblas:release-0.2.19-2017.01.04.10.18
 
 ENV \
     X_DOCKER_REPO_NAME=spark \
@@ -13,9 +13,7 @@ ENV \
 #    X_SPARK_DOWNLOAD_URI="https://github.com/apache/spark/archive/v2.1.0-rc5.tar.gz" \
 #    X_SPARK_DOWNLOAD_URI="http://ftp.riken.jp/net/apache/spark/spark-2.0.1/spark-2.0.1.tgz" \
     SPARK_HOME=/opt/local/spark \
-#    PYSPARK_DRIVER_PYTHON=/opt/local/python-${X_PY3_VERSION}/bin/python3 \
     PYSPARK_DRIVER_PYTHON=/opt/local/python-3/bin/python3 \
-#    PYSPARK_PYTHON=/opt/local/python-${X_PY3_VERSION}/bin/python3 \
     PYSPARK_PYTHON=/opt/local/python-3/bin/python3 \
     SPARK_EXECUTOR_URI=file:///opt/local/spark/dist/spark-2.1.0-bin-${X_HADOOP_VERSION}.tgz
 
@@ -24,22 +22,22 @@ RUN \
     export TERM=dumb && \
     export LANG='en_US.UTF-8' && \
     source /opt/local/bin/x-set-shell-fonts-env.sh && \
-    echo -e "${FONT_INFO}[INFO] Updating package database${FONT_DEFAULT}" && \
+    echo -e "${FONT_INFO}[INFO] Update package database${FONT_DEFAULT}" && \
     reflector --latest 100 --verbose --sort score --save /etc/pacman.d/mirrorlist && \
     sudo -u nobody yaourt -Syy && \
-    echo -e "${FONT_SUCCESS}[SUCCESS] Updated package database${FONT_DEFAULT}" && \
-    echo -e "${FONT_INFO}[INFO] Refreshing package developer keys${FONT_DEFAULT}" && \
+    echo -e "${FONT_SUCCESS}[SUCCESS] Update package database${FONT_DEFAULT}" && \
+    echo -e "${FONT_INFO}[INFO] Refresh package developer keys${FONT_DEFAULT}" && \
     pacman-key --refresh-keys && \
-    echo -e "${FONT_SUCCESS}[SUCCESS] Refreshed package developer keys${FONT_DEFAULT}" && \
+    echo -e "${FONT_SUCCESS}[SUCCESS] Refresh package developer keys${FONT_DEFAULT}" && \
     # required by mesos native library
     REQUIRED_PACKAGES=("boost" "gperftools" "google-glog" "leveldb" "protobuf" "protobuf-java" "picojson-git") && \
-    echo -e "${FONT_INFO}[INFO] Installing required packages [${REQUIRED_PACKAGES[@]}]${FONT_DEFAULT}" && \
+    echo -e "${FONT_INFO}[INFO] Install required packages [${REQUIRED_PACKAGES[@]}]${FONT_DEFAULT}" && \
     mkdir /.m2 && \
     chown nobody:nobody /.m2 && \
     sudo -u nobody yaourt -S --needed --noconfirm --noprogressbar "${REQUIRED_PACKAGES[@]}" && \
     rm -rf /.m2 && \
-    echo -e "${FONT_SUCCESS}[SUCCESS] Installed required packages [${REQUIRED_PACKAGES[@]}]${FONT_SUCCESS}" && \
-    echo -e "${FONT_INFO}[INFO] Installing spark-${X_SPARK_VERSION}${FONT_DEFAULT}" && \
+    echo -e "${FONT_SUCCESS}[SUCCESS] Install required packages [${REQUIRED_PACKAGES[@]}]${FONT_SUCCESS}" && \
+    echo -e "${FONT_INFO}[INFO] Install spark-${X_SPARK_VERSION}${FONT_DEFAULT}" && \
     ([ -d /opt/local ] || mkdir -p /opt/local) && \
     cd /var/tmp && \
     if [[ "${X_SPARK_CLONE_REPO_CMD}" ]];then\
@@ -84,7 +82,8 @@ RUN \
     cd /opt/local && \
     porg --log --package="spark-${X_SPARK_VERSION}" -+ -- ln -sf spark-${X_SPARK_VERSION} spark && \
     rm -rf /var/tmp/spark-${X_SPARK_VERSION} && \
-    echo -e "${FONT_SUCCESS}[SUCCESS] Installed spark-${X_SPARK_VERSION}${FONT_DEFAULT}" && \
+    /opt/local/python-3/bin/pip3 install -U /opt/local/spark/python/dist/*.tar.gz && \
+    echo -e "${FONT_SUCCESS}[SUCCESS] Install spark-${X_SPARK_VERSION}${FONT_DEFAULT}" && \
     /opt/local/bin/x-archlinux-remove-unnecessary-files.sh && \
 #    pacman-optimize && \
     rm -f /etc/machine-id
