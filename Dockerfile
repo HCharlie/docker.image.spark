@@ -30,7 +30,8 @@ RUN \
     pacman-key --refresh-keys && \
     echo -e "${FONT_SUCCESS}[SUCCESS] Refresh package developer keys${FONT_DEFAULT}" && \
     # required by mesos native library
-    REQUIRED_PACKAGES=("boost" "gperftools" "google-glog" "leveldb" "protobuf" "protobuf-java" "picojson-git") && \
+    # REQUIRED_PACKAGES=("boost" "gperftools" "google-glog" "leveldb" "protobuf" "protobuf-java" "picojson-git") && \
+    REQUIRED_PACKAGES=("gperftools" "google-glog" "leveldb" "protobuf" "picojson-git") && \
     echo -e "${FONT_INFO}[INFO] Install required packages [${REQUIRED_PACKAGES[@]}]${FONT_DEFAULT}" && \
     mkdir /.m2 && \
     chown nobody:nobody /.m2 && \
