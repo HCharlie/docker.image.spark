@@ -54,7 +54,7 @@ RUN \
         rm -f python/pyspark/cloudpickle.py && \
         curl --silent --location --fail --retry 5 -o python/pyspark/cloudpickle.py "https://raw.githubusercontent.com/HyukjinKwon/spark/6458d4185da9ed9772bb4317a82b26da784a89ee/python/pyspark/cloudpickle.py" && \
         rm -f python/pyspark/serializers.py && \
-        curl --silent --location --fail --retry 5 -o python/pyspark/serializers.py "https://raw.githubusercontent.com/HyukjinKwon/spark/6458d4185da9ed9772bb4317a82b26da784a89ee/python/pyspark/serializers.py" && \
+        curl --silent --location --fail --retry 5 -o python/pyspark/serializers.py "https://raw.githubusercontent.com/HyukjinKwon/spark/6458d4185da9ed9772bb4317a82b26da784a89ee/python/pyspark/serializers.py"\
     fi; \
     sed --in-place -e 's|log4j\.rootCategory=INFO|log4\.rootCategory=WARN|g' conf/log4j.properties.template && \
     export X_INTERNAL_SPARK_VERSION=$(build/mvn help:evaluate -Dexpression=project.version -Pyarn -Phadoop-2.7 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver -Pnetlib-lgpl 2>/dev/null | grep -v "INFO" | tail -n 1) && \
