@@ -99,7 +99,9 @@ RUN \
     cd /opt/local && \
     porg --log --package="spark-${X_SPARK_VERSION}" -+ -- ln -sf spark-${X_SPARK_VERSION} spark && \
     rm -rf /var/tmp/spark-${X_SPARK_VERSION} && \
-    /opt/local/python-3/bin/pip3 install -U /opt/local/spark/python/dist/*.tar.gz && \
+    if [[ -d /opt/local/spark/python/dist ]];then\
+      /opt/local/python-3/bin/pip3 install -U /opt/local/spark/python/dist/*.tar.gz;\
+    fi; \
     echo -e "${FONT_SUCCESS}[SUCCESS] Install spark-${X_SPARK_VERSION}${FONT_DEFAULT}" && \
     /opt/local/bin/x-archlinux-remove-unnecessary-files.sh && \
 #    pacman-optimize && \
