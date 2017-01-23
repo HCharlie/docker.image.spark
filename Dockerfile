@@ -79,16 +79,20 @@ RUN \
     tar xvzf spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}.tgz -C x_mago_dist/. && \
     rm spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}.tgz && \
     cp -ap x_mago_dist/spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}/conf/log4j.properties.template x_mago_dist/spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}/conf/log4j.properties && \
-    cd x_mago_dist/spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}/python && \
-    /opt/local/python-3/bin/python3 setup.py sdist && \
-    /opt/local/python-3/bin/python3 setup.py bdist_wheel && \
-    cd ../../.. && \
+    if [[ -f x_mago_dist/spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}/python/setup.py ]];then\
+      cd x_mago_dist/spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}/python && \
+      /opt/local/python-3/bin/python3 setup.py sdist && \
+      /opt/local/python-3/bin/python3 setup.py bdist_wheel && \
+      cd ../../..;\
+    fi; \
     tar -C x_mago_dist -cvzf spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}.tgz spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION} && \
     rm -rf x_mago_dist && \
-    cd dist/python && \
-    /opt/local/python-3/bin/python3 setup.py sdist && \
-    /opt/local/python-3/bin/python3 setup.py bdist_wheel && \
-    cd ../.. && \
+    if [[ -f dist/python/setup.py ]];then\
+      cd dist/python && \
+      /opt/local/python-3/bin/python3 setup.py sdist && \
+      /opt/local/python-3/bin/python3 setup.py bdist_wheel && \
+      cd ../..;\
+    fi; \
     porg --log --package="spark-${X_SPARK_VERSION}" -- mv dist /opt/local/spark-${X_SPARK_VERSION} && \
     porg --log --package="spark-${X_SPARK_VERSION}" -+ -- mkdir /opt/local/spark-${X_SPARK_VERSION}/dist && \
     porg --log --package="spark-${X_SPARK_VERSION}" -+ -- mv spark-${X_INTERNAL_SPARK_VERSION}*.tgz /opt/local/spark-${X_SPARK_VERSION}/dist/. && \
