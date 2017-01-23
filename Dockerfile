@@ -66,7 +66,7 @@ RUN \
     # export MAVEN_OPTS="-Xmx2g -XX:MaxPermSize=512M -XX:ReservedCodeCacheSize=512m" && \
     export MAVEN_OPTS="-Xmx2g -XX:ReservedCodeCacheSize=512m" && \
     if [[ ${X_INTERNAL_SPARK_VERSION_MAJOR} -ge 2 ]];then\
-      if [[ ${X_INTERNAL_SPARK_VERSION_MINOR} -ge 1 ]];then
+      if [[ ${X_INTERNAL_SPARK_VERSION_MINOR} -ge 1 ]];then\
         ${MAKE_DIST_PATH} --tgz -Pyarn -Phadoop-2.7 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver -Pmesos -Pnetlib-lgpl;\
       else\
         ${MAKE_DIST_PATH} --tgz -Pyarn -Phadoop-2.7 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver -Pnetlib-lgpl;\
