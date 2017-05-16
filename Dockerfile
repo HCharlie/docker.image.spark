@@ -2,11 +2,11 @@
 # - build with netlib-java
 # http://qiita.com/adachij2002/items/b9af506d704434f4f293
 
-FROM takaomag/openblas:release-0.2.19-2017.01.16.05.02
+FROM takaomag/openblas:release-0.2.19-2017.05.16.03.53
 
 ENV \
     X_DOCKER_REPO_NAME=spark \
-    X_SPARK_VERSION=2.1.0 \
+    X_SPARK_VERSION=2.1.1 \
 #    X_SPARK_VERSION=2.1.0-rc5 \
 #    X_SPARK_VERSION=2.0.2 \
 #    X_SPARK_CLONE_REPO_CMD="git clone -b branch-2.0 git://git.apache.org/spark.git" \
@@ -15,7 +15,7 @@ ENV \
     SPARK_HOME=/opt/local/spark \
     PYSPARK_DRIVER_PYTHON=/opt/local/python-3/bin/python3 \
     PYSPARK_PYTHON=/opt/local/python-3/bin/python3 \
-    SPARK_EXECUTOR_URI=file:///opt/local/spark/dist/spark-2.1.0-bin-${X_HADOOP_VERSION}.tgz
+    SPARK_EXECUTOR_URI=file:///opt/local/spark/dist/spark-2.1.1-bin-${X_HADOOP_VERSION}.tgz
 
 RUN \
     echo "2016-05-06-1" > /dev/null && \
