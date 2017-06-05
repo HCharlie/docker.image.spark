@@ -2,7 +2,7 @@
 # - build with netlib-java
 # http://qiita.com/adachij2002/items/b9af506d704434f4f293
 
-FROM takaomag/openblas:release-0.2.19-2017.05.16.03.53
+FROM takaomag/openblas:release-0.2.19-2017.06.05.04.05
 
 ENV \
     X_DOCKER_REPO_NAME=spark \
