@@ -2,20 +2,20 @@
 # - build with netlib-java
 # http://qiita.com/adachij2002/items/b9af506d704434f4f293
 
-FROM takaomag/openblas:release-0.2.19-2017.06.05.04.05
+FROM takaomag/openblas:branch-master-2017.07.07.07.16
 
 ENV \
     X_DOCKER_REPO_NAME=spark \
-    X_SPARK_VERSION=2.1.1 \
-#    X_SPARK_VERSION=2.1.0-rc5 \
-#    X_SPARK_VERSION=2.0.2 \
-#    X_SPARK_CLONE_REPO_CMD="git clone -b branch-2.0 git://git.apache.org/spark.git" \
-#    X_SPARK_DOWNLOAD_URI="https://github.com/apache/spark/archive/v2.1.0-rc5.tar.gz" \
-#    X_SPARK_DOWNLOAD_URI="http://ftp.riken.jp/net/apache/spark/spark-2.0.1/spark-2.0.1.tgz" \
+    X_SPARK_VERSION=2.2.0 \
     SPARK_HOME=/opt/local/spark \
     PYSPARK_DRIVER_PYTHON=/opt/local/python-3/bin/python3 \
     PYSPARK_PYTHON=/opt/local/python-3/bin/python3 \
-    SPARK_EXECUTOR_URI=file:///opt/local/spark/dist/spark-2.1.1-bin-${X_HADOOP_VERSION}.tgz
+    SPARK_EXECUTOR_URI=file:///opt/local/spark/dist/spark-2.2.0-bin-${X_HADOOP_VERSION}.tgz
+
+#    X_SPARK_VERSION=2.1.0-rc5 \
+#    X_SPARK_CLONE_REPO_CMD="git clone -b branch-2.0 git://git.apache.org/spark.git" \
+#    X_SPARK_DOWNLOAD_URI="https://github.com/apache/spark/archive/v2.1.0-rc5.tar.gz" \
+#    X_SPARK_DOWNLOAD_URI="http://ftp.riken.jp/net/apache/spark/spark-2.0.1/spark-2.0.1.tgz" \
 
 RUN \
     echo "2016-05-06-1" > /dev/null && \
@@ -35,6 +35,7 @@ RUN \
     echo -e "${FONT_INFO}[INFO] Install required packages [${REQUIRED_PACKAGES[@]}]${FONT_DEFAULT}" && \
     mkdir /.m2 && \
     chown nobody:nobody /.m2 && \
+    cd /var/tmp && \
     sudo -u nobody yaourt -S --needed --noconfirm --noprogressbar "${REQUIRED_PACKAGES[@]}" && \
     rm -rf /.m2 && \
     echo -e "${FONT_SUCCESS}[SUCCESS] Install required packages [${REQUIRED_PACKAGES[@]}]${FONT_SUCCESS}" && \
@@ -48,7 +49,7 @@ RUN \
     else\
       APACHE_CLOSER_MIRROR=$(curl --silent --location --fail --retry 5 --stderr /dev/null "https://www.apache.org/dyn/closer.cgi?as_json=1" | jq -r '.preferred') && \
       curl --silent --location --fail --retry 5 "${APACHE_CLOSER_MIRROR}spark/spark-${X_SPARK_VERSION}/spark-${X_SPARK_VERSION}.tgz" | tar xz;\
-    fi; \
+    fi && \
     cd spark-${X_SPARK_VERSION} && \
     if [[ "${X_SPARK_VERSION}" == '2.1.0' ]];then\
         # https://github.com/apache/spark/pull/16429
@@ -56,9 +57,9 @@ RUN \
         curl --silent --location --fail --retry 5 -o python/pyspark/cloudpickle.py "https://raw.githubusercontent.com/HyukjinKwon/spark/6458d4185da9ed9772bb4317a82b26da784a89ee/python/pyspark/cloudpickle.py" && \
         rm -f python/pyspark/serializers.py && \
         curl --silent --location --fail --retry 5 -o python/pyspark/serializers.py "https://raw.githubusercontent.com/HyukjinKwon/spark/6458d4185da9ed9772bb4317a82b26da784a89ee/python/pyspark/serializers.py";\
-    fi; \
-    sed --in-place -e 's|log4j\.rootCategory=INFO|log4\.rootCategory=WARN|g' conf/log4j.properties.template && \
-    export X_INTERNAL_SPARK_VERSION=$(build/mvn help:evaluate -Dexpression=project.version -Pyarn -Phadoop-2.7 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver -Pnetlib-lgpl 2>/dev/null | grep -v "INFO" | tail -n 1) && \
+    fi && \
+    sed --in-place -e 's|log4j\.rootCategory=INFO|log4\.rootCategory=WARN|g' -e 's|log4j\.logger\.org\.apache\.spark\.repl\.SparkIMain$exprTyper=INFO|log4j\.logger\.org\.apache\.spark\.repl\.SparkIMain$exprTyper=WARN|g' -e 's|log4j\.logger\.org\.apache\.spark\.repl\.SparkILoop$SparkILoopInterpreter=INFO|log4j\.logger\.org\.apache\.spark\.repl\.SparkILoop$SparkILoopInterpreter=WARN|g' conf/log4j.properties.template && \
+    export X_INTERNAL_SPARK_VERSION=$(build/mvn help:evaluate -Dexpression=project.version -Pyarn -Phadoop-2.7 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver -Pnetlib-lgpl 2>/dev/null | egrep -v -e '^\[.+\]' | tail -n 1) && \
     X_INTERNAL_SPARK_VERSION_MAJOR=$(cut -d '.' -f 1 <<< ${X_INTERNAL_SPARK_VERSION}) && \
     [[ -f ./make-distribution.sh ]] && MAKE_DIST_PATH='./make-distribution.sh' || MAKE_DIST_PATH='dev/make-distribution.sh' && \
     export JAVA_HOME=/usr/lib/jvm/java-8-openjdk && \
@@ -68,7 +69,7 @@ RUN \
       ${MAKE_DIST_PATH} --tgz -Pyarn -Phadoop-2.7 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver -Pmesos -Pnetlib-lgpl;\
     else\
       ${MAKE_DIST_PATH} --tgz --skip-java-test --with-tachyon -Pyarn -Phadoop-2.6 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver -Pnetlib-lgpl;\
-    fi; \
+    fi && \
     cp -ap dist/conf/log4j.properties.template dist/conf/log4j.properties && \
     mkdir x_mago_dist && \
     tar xvzf spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}.tgz -C x_mago_dist/. && \
@@ -77,12 +78,14 @@ RUN \
     cd x_mago_dist/spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}/python && \
     /opt/local/python-3/bin/python3 setup.py sdist && \
     /opt/local/python-3/bin/python3 setup.py bdist_wheel && \
+    rm -rf build/ .eggs/ pyspark.egg-info/ && \
     cd ../../.. && \
-    tar -C x_mago_dist -cvzf spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}.tgz spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION} && \
+    tar -C x_mago_dist -czf spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}.tgz spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION} && \
     rm -rf x_mago_dist && \
     cd dist/python && \
     /opt/local/python-3/bin/python3 setup.py sdist && \
     /opt/local/python-3/bin/python3 setup.py bdist_wheel && \
+    rm -rf build/ .eggs/ pyspark.egg-info/ && \
     cd ../.. && \
     porg --log --package="spark-${X_SPARK_VERSION}" -- mv dist /opt/local/spark-${X_SPARK_VERSION} && \
     porg --log --package="spark-${X_SPARK_VERSION}" -+ -- mkdir /opt/local/spark-${X_SPARK_VERSION}/dist && \
@@ -90,7 +93,8 @@ RUN \
     cd /opt/local && \
     porg --log --package="spark-${X_SPARK_VERSION}" -+ -- ln -sf spark-${X_SPARK_VERSION} spark && \
     rm -rf /var/tmp/spark-${X_SPARK_VERSION} && \
-    /opt/local/python-3/bin/pip3 install -U /opt/local/spark/python/dist/*.tar.gz && \
+#    /opt/local/python-3/bin/pip3 install -U /opt/local/spark/python/dist/*.tar.gz && \
+    /opt/local/python-3/bin/pip3 install -U /opt/local/spark/python/dist/*.whl && \
     echo -e "${FONT_SUCCESS}[SUCCESS] Install spark-${X_SPARK_VERSION}${FONT_DEFAULT}" && \
     /opt/local/bin/x-archlinux-remove-unnecessary-files.sh && \
 #    pacman-optimize && \
