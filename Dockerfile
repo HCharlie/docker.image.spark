@@ -2,7 +2,7 @@
 # - build with netlib-java
 # http://qiita.com/adachij2002/items/b9af506d704434f4f293
 
-FROM takaomag/openblas:branch-master-2017.07.07.07.16
+FROM takaomag/openblas:release-0.2.20-2017.08.07.07.13
 
 ENV \
     X_DOCKER_REPO_NAME=spark \
@@ -22,16 +22,20 @@ RUN \
     export TERM=dumb && \
     export LANG='en_US.UTF-8' && \
     source /opt/local/bin/x-set-shell-fonts-env.sh && \
+
     echo -e "${FONT_INFO}[INFO] Update package database${FONT_DEFAULT}" && \
     reflector --latest 100 --verbose --sort score --save /etc/pacman.d/mirrorlist && \
     sudo -u nobody yaourt -Syy && \
     echo -e "${FONT_SUCCESS}[SUCCESS] Update package database${FONT_DEFAULT}" && \
+
     echo -e "${FONT_INFO}[INFO] Refresh package developer keys${FONT_DEFAULT}" && \
     pacman-key --refresh-keys && \
     echo -e "${FONT_SUCCESS}[SUCCESS] Refresh package developer keys${FONT_DEFAULT}" && \
+
     # required by mesos native library
     # REQUIRED_PACKAGES=("boost" "gperftools" "google-glog" "leveldb" "protobuf" "protobuf-java" "picojson-git") && \
     REQUIRED_PACKAGES=("gperftools" "google-glog" "leveldb" "protobuf" "picojson-git") && \
+
     echo -e "${FONT_INFO}[INFO] Install required packages [${REQUIRED_PACKAGES[@]}]${FONT_DEFAULT}" && \
     mkdir /.m2 && \
     chown nobody:nobody /.m2 && \
@@ -39,6 +43,7 @@ RUN \
     sudo -u nobody yaourt -S --needed --noconfirm --noprogressbar "${REQUIRED_PACKAGES[@]}" && \
     rm -rf /.m2 && \
     echo -e "${FONT_SUCCESS}[SUCCESS] Install required packages [${REQUIRED_PACKAGES[@]}]${FONT_SUCCESS}" && \
+
     echo -e "${FONT_INFO}[INFO] Install spark-${X_SPARK_VERSION}${FONT_DEFAULT}" && \
     ([ -d /opt/local ] || mkdir -p /opt/local) && \
     cd /var/tmp && \
@@ -96,6 +101,7 @@ RUN \
 #    /opt/local/python-3/bin/pip3 install -U /opt/local/spark/python/dist/*.tar.gz && \
     /opt/local/python-3/bin/pip3 install -U /opt/local/spark/python/dist/*.whl && \
     echo -e "${FONT_SUCCESS}[SUCCESS] Install spark-${X_SPARK_VERSION}${FONT_DEFAULT}" && \
+
     /opt/local/bin/x-archlinux-remove-unnecessary-files.sh && \
 #    pacman-optimize && \
     rm -f /etc/machine-id
