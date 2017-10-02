@@ -2,7 +2,9 @@
 # - build with netlib-java
 # http://qiita.com/adachij2002/items/b9af506d704434f4f293
 
-FROM takaomag/netlib-java:release-1.1.2-2017.08.07.07.13
+# netlib-java seems to be discontinued.
+# FROM takaomag/netlib-java:release-1.1.2-2017.08.07.07.13
+FROM takaomag/openblas:release-0.2.20-2017.10.02.01.36
 
 ENV \
     X_DOCKER_REPO_NAME=spark \
@@ -28,9 +30,9 @@ RUN \
     sudo -u nobody yaourt -Syy && \
     echo -e "${FONT_SUCCESS}[SUCCESS] Update package database${FONT_DEFAULT}" && \
 
-    echo -e "${FONT_INFO}[INFO] Refresh package developer keys${FONT_DEFAULT}" && \
-    pacman-key --refresh-keys && \
-    echo -e "${FONT_SUCCESS}[SUCCESS] Refresh package developer keys${FONT_DEFAULT}" && \
+#    echo -e "${FONT_INFO}[INFO] Refresh package developer keys${FONT_DEFAULT}" && \
+#    pacman-key --refresh-keys && \
+#    echo -e "${FONT_SUCCESS}[SUCCESS] Refresh package developer keys${FONT_DEFAULT}" && \
 
     # required by mesos native library
     # REQUIRED_PACKAGES=("boost" "gperftools" "google-glog" "leveldb" "protobuf" "protobuf-java" "picojson-git") && \
@@ -45,6 +47,7 @@ RUN \
     echo -e "${FONT_SUCCESS}[SUCCESS] Install required packages [${REQUIRED_PACKAGES[@]}]${FONT_SUCCESS}" && \
 
     echo -e "${FONT_INFO}[INFO] Install spark-${X_SPARK_VERSION}${FONT_DEFAULT}" && \
+    archlinux-java set java-8-openjdk && \
     ([ -d /opt/local ] || mkdir -p /opt/local) && \
     cd /var/tmp && \
     if [[ "${X_SPARK_CLONE_REPO_CMD}" ]];then\
@@ -64,16 +67,19 @@ RUN \
         curl --silent --location --fail --retry 5 -o python/pyspark/serializers.py "https://raw.githubusercontent.com/HyukjinKwon/spark/6458d4185da9ed9772bb4317a82b26da784a89ee/python/pyspark/serializers.py";\
     fi && \
     sed --in-place -e 's|log4j\.rootCategory=INFO|log4\.rootCategory=WARN|g' -e 's|log4j\.logger\.org\.apache\.spark\.repl\.SparkIMain$exprTyper=INFO|log4j\.logger\.org\.apache\.spark\.repl\.SparkIMain$exprTyper=WARN|g' -e 's|log4j\.logger\.org\.apache\.spark\.repl\.SparkILoop$SparkILoopInterpreter=INFO|log4j\.logger\.org\.apache\.spark\.repl\.SparkILoop$SparkILoopInterpreter=WARN|g' conf/log4j.properties.template && \
-    export X_INTERNAL_SPARK_VERSION=$(build/mvn help:evaluate -Dexpression=project.version -Pyarn -Phadoop-2.7 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver -Pnetlib-lgpl 2>/dev/null | egrep -v -e '^\[.+\]' | tail -n 1) && \
+    # netlib-java seems to be discontinued.
+    # X_WITH_NETLIB='-Pnetlib-lgpl' && \
+    X_WITH_NETLIB='' && \
+    export X_INTERNAL_SPARK_VERSION=$(build/mvn help:evaluate -Dexpression=project.version -Pyarn -Phadoop-2.7 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver ${X_WITH_NETLIB} 2>/dev/null | egrep -v -e '^\[.+\]' | tail -n 1) && \
     X_INTERNAL_SPARK_VERSION_MAJOR=$(cut -d '.' -f 1 <<< ${X_INTERNAL_SPARK_VERSION}) && \
     [[ -f ./make-distribution.sh ]] && MAKE_DIST_PATH='./make-distribution.sh' || MAKE_DIST_PATH='dev/make-distribution.sh' && \
     export JAVA_HOME=/usr/lib/jvm/java-8-openjdk && \
     # export MAVEN_OPTS="-Xmx2g -XX:MaxPermSize=512M -XX:ReservedCodeCacheSize=512m" && \
     export MAVEN_OPTS="-Xmx2g -XX:ReservedCodeCacheSize=512m" && \
     if [[ ${X_INTERNAL_SPARK_VERSION_MAJOR} -ge 2 ]];then\
-      ${MAKE_DIST_PATH} --tgz -Pyarn -Phadoop-2.7 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver -Pmesos -Pnetlib-lgpl;\
+      ${MAKE_DIST_PATH} --tgz -Pyarn -Phadoop-2.7 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver -Pmesos ${X_WITH_NETLIB};\
     else\
-      ${MAKE_DIST_PATH} --tgz --skip-java-test --with-tachyon -Pyarn -Phadoop-2.6 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver -Pnetlib-lgpl;\
+      ${MAKE_DIST_PATH} --tgz --skip-java-test --with-tachyon -Pyarn -Phadoop-2.6 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver ${X_WITH_NETLIB};\
     fi && \
     cp -ap dist/conf/log4j.properties.template dist/conf/log4j.properties && \
     mkdir x_mago_dist && \
