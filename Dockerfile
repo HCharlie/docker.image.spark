@@ -11,7 +11,8 @@ ENV \
     SPARK_HOME=/opt/local/spark \
     PYSPARK_DRIVER_PYTHON=/opt/local/python-3/bin/python3 \
     PYSPARK_PYTHON=/opt/local/python-3/bin/python3 \
-    SPARK_EXECUTOR_URI=file:///opt/local/spark/dist/spark-2.2.1-bin-${X_HADOOP_VERSION}.tgz
+#    SPARK_EXECUTOR_URI=file:///opt/local/spark/dist/spark-2.2.1-bin-${X_HADOOP_VERSION}.tgz
+    SPARK_EXECUTOR_URI=file:///opt/local/spark/dist/spark-2.2.1-bin-2.9.0.tgz
 
 #    X_SPARK_VERSION=2.1.0-rc5 \
 #    X_SPARK_CLONE_REPO_CMD="git clone -b branch-2.0 git://git.apache.org/spark.git" \
@@ -65,19 +66,22 @@ RUN \
         rm -f python/pyspark/serializers.py && \
         curl --silent --location --fail --retry 5 -o python/pyspark/serializers.py "https://raw.githubusercontent.com/HyukjinKwon/spark/6458d4185da9ed9772bb4317a82b26da784a89ee/python/pyspark/serializers.py";\
     fi && \
-    [[ "$(cut -d. -f1 <<< ${X_HADOOP_VERSION})" != '3' ]] || sed --in-place -e 's|<id>hadoop-2\.7</id>|<id>hadoop-3\.0</id>|g' -e 's|<hadoop\.version>2\.7\.3</hadoop\.version>|<hadoop\.version>3\.0\.0</hadoop\.version>|g' pom.xml && \
-    sed --in-place -e 's|log4j\.rootCategory=INFO|log4\.rootCategory=WARN|g' -e 's|log4j\.logger\.org\.apache\.spark\.repl\.SparkIMain$exprTyper=INFO|log4j\.logger\.org\.apache\.spark\.repl\.SparkIMain$exprTyper=WARN|g' -e 's|log4j\.logger\.org\.apache\.spark\.repl\.SparkILoop$SparkILoopInterpreter=INFO|log4j\.logger\.org\.apache\.spark\.repl\.SparkILoop$SparkILoopInterpreter=WARN|g' conf/log4j.properties.template && \
+# Hive does not support hadoop 3.0.0 yet
+    X_HADOOP_VERSION=2.9.0 && \
+#     [[ "$(cut -d. -f1 <<< ${X_HADOOP_VERSION})" != '3' ]] || sed --in-place -e 's|<id>hadoop-2\.7</id>|<id>hadoop-3\.0</id>|g' -e 's|<hadoop\.version>2\.7\.3</hadoop\.version>|<hadoop\.version>3\.0\.0</hadoop\.version>|g' pom.xml && \
+    sed --in-place -e 's|log4j\.rootCategory=INFO|log4j\.rootCategory=WARN|g' -e 's|log4j\.logger\.org\.apache\.spark\.repl\.SparkIMain$exprTyper=INFO|log4j\.logger\.org\.apache\.spark\.repl\.SparkIMain$exprTyper=WARN|g' -e 's|log4j\.logger\.org\.apache\.spark\.repl\.SparkILoop$SparkILoopInterpreter=INFO|log4j\.logger\.org\.apache\.spark\.repl\.SparkILoop$SparkILoopInterpreter=WARN|g' conf/log4j.properties.template && \
     X_WITH_NETLIB='-Pnetlib-lgpl' && \
-    export X_INTERNAL_SPARK_VERSION=$(build/mvn help:evaluate -Dexpression=project.version -Pyarn -Phadoop-$(cut -d. -f1,2 <<< ${X_HADOOP_VERSION}) -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver ${X_WITH_NETLIB} 2>/dev/null | egrep -v -e '^\[.+\]' | tail -n 1) && \
+#    export X_INTERNAL_SPARK_VERSION=$(build/mvn help:evaluate -Dexpression=project.version -Pyarn -Phadoop-$(cut -d. -f1,2 <<< ${X_HADOOP_VERSION}) -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver ${X_WITH_NETLIB} 2>/dev/null | egrep -v -e '^\[.+\]' | tail -n 1) && \
+    export X_INTERNAL_SPARK_VERSION=$(build/mvn help:evaluate -Dexpression=project.version -Pyarn -Phadoop-2.7 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver ${X_WITH_NETLIB} 2>/dev/null | egrep -v -e '^\[.+\]' | tail -n 1) && \
     X_INTERNAL_SPARK_VERSION_MAJOR=$(cut -d '.' -f 1 <<< ${X_INTERNAL_SPARK_VERSION}) && \
     [[ -f ./make-distribution.sh ]] && MAKE_DIST_PATH='./make-distribution.sh' || MAKE_DIST_PATH='dev/make-distribution.sh' && \
     export JAVA_HOME=/usr/lib/jvm/java-8-openjdk && \
     # export MAVEN_OPTS="-Xmx2g -XX:MaxPermSize=512M -XX:ReservedCodeCacheSize=512m" && \
     export MAVEN_OPTS="-Xmx2g -XX:ReservedCodeCacheSize=512m" && \
     if [[ ${X_INTERNAL_SPARK_VERSION_MAJOR} -ge 2 ]];then\
-      ${MAKE_DIST_PATH} --tgz -Pyarn -Phadoop-$(cut -d. -f1,2 <<< ${X_HADOOP_VERSION}) -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver -Pmesos ${X_WITH_NETLIB};\
+      ${MAKE_DIST_PATH} --tgz -Pyarn -Phadoop-2.7 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver -Pmesos ${X_WITH_NETLIB};\
     else\
-      ${MAKE_DIST_PATH} --tgz --skip-java-test --with-tachyon -Pyarn -Phadoop-$(cut -d. -f1,2 <<< ${X_HADOOP_VERSION}) -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver ${X_WITH_NETLIB};\
+      ${MAKE_DIST_PATH} --tgz --skip-java-test --with-tachyon -Pyarn -Phadoop-2.7 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver ${X_WITH_NETLIB};\
     fi && \
     cp -ap dist/conf/log4j.properties.template dist/conf/log4j.properties && \
     mkdir x_mago_dist && \
@@ -101,6 +105,7 @@ RUN \
     porg --log --package="spark-${X_SPARK_VERSION}" -+ -- mv spark-${X_INTERNAL_SPARK_VERSION}*.tgz /opt/local/spark-${X_SPARK_VERSION}/dist/. && \
     cd /opt/local && \
     porg --log --package="spark-${X_SPARK_VERSION}" -+ -- ln -sf spark-${X_SPARK_VERSION} spark && \
+    porg --log --package="spark-${X_SPARK_VERSION}" -+ -- cp /usr/share/java/jna.jar spark-${X_SPARK_VERSION}/jars/. && \
     rm -rf /var/tmp/spark-${X_SPARK_VERSION} && \
 #    /opt/local/python-3/bin/pip3 install -U /opt/local/spark/python/dist/*.tar.gz && \
     /opt/local/python-3/bin/pip3 install -U /opt/local/spark/python/dist/*.whl && \
@@ -109,6 +114,8 @@ RUN \
     /opt/local/bin/x-archlinux-remove-unnecessary-files.sh && \
 #    pacman-optimize && \
     rm -f /etc/machine-id
+
+ADD log4j-systemd-journal-appender-1.3.2.log4j-1.2.17.jna-4.4.0.jar /opt/local/spark/jars/log4j-systemd-journal-appender-1.3.2.jar
 
 # spark.mesos.executor.docker.image assumes the default working directory of the container to be inside $SPARK_HOME.
 WORKDIR /opt/local/spark
