@@ -19,6 +19,8 @@ ENV \
 #    X_SPARK_DOWNLOAD_URI="https://github.com/apache/spark/archive/v2.1.0-rc5.tar.gz" \
 #    X_SPARK_DOWNLOAD_URI="http://ftp.riken.jp/net/apache/spark/spark-2.0.1/spark-2.0.1.tgz" \
 
+ADD log4j-systemd-journal-appender-1.3.2.log4j-1.2.17.jna-4.4.0.jar /tmp/log4j-systemd-journal-appender-1.3.2.jar
+
 RUN \
     echo "2016-05-06-1" > /dev/null && \
     export TERM=dumb && \
@@ -87,6 +89,8 @@ RUN \
     mkdir x_mago_dist && \
     tar xvzf spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}.tgz -C x_mago_dist/. && \
     rm spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}.tgz && \
+    cp /tmp/log4j-systemd-journal-appender-1.3.2.jar x_mago_dist/spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}/jars/. && \
+    cp /usr/share/java/jna.jar x_mago_dist/spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}/jars/. &&
     cp -ap x_mago_dist/spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}/conf/log4j.properties.template x_mago_dist/spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}/conf/log4j.properties && \
     cd x_mago_dist/spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}/python && \
     /opt/local/python-3/bin/python3 setup.py sdist && \
@@ -105,6 +109,7 @@ RUN \
     porg --log --package="spark-${X_SPARK_VERSION}" -+ -- mv spark-${X_INTERNAL_SPARK_VERSION}*.tgz /opt/local/spark-${X_SPARK_VERSION}/dist/. && \
     cd /opt/local && \
     porg --log --package="spark-${X_SPARK_VERSION}" -+ -- ln -sf spark-${X_SPARK_VERSION} spark && \
+    porg --log --package="spark-${X_SPARK_VERSION}" -+ -- mv /tmp/log4j-systemd-journal-appender-1.3.2.jar spark-${X_SPARK_VERSION}/jars/. && \
     porg --log --package="spark-${X_SPARK_VERSION}" -+ -- cp /usr/share/java/jna.jar spark-${X_SPARK_VERSION}/jars/. && \
     rm -rf /var/tmp/spark-${X_SPARK_VERSION} && \
 #    /opt/local/python-3/bin/pip3 install -U /opt/local/spark/python/dist/*.tar.gz && \
@@ -114,8 +119,6 @@ RUN \
     /opt/local/bin/x-archlinux-remove-unnecessary-files.sh && \
 #    pacman-optimize && \
     rm -f /etc/machine-id
-
-ADD log4j-systemd-journal-appender-1.3.2.log4j-1.2.17.jna-4.4.0.jar /opt/local/spark/jars/log4j-systemd-journal-appender-1.3.2.jar
 
 # spark.mesos.executor.docker.image assumes the default working directory of the container to be inside $SPARK_HOME.
 WORKDIR /opt/local/spark
