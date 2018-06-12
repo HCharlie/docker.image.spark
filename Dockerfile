@@ -2,7 +2,7 @@
 # - build with netlib-java
 # http://qiita.com/adachij2002/items/b9af506d704434f4f293
 
-FROM quay.io/takaomag/netlib-java:release-1.1.2-2018.03.10.05.27
+FROM quay.io/takaomag/netlib-java:release-1.1.2-2018.06.12.03.50
 
 ENV \
     X_DOCKER_REPO_NAME=spark \
@@ -10,9 +10,8 @@ ENV \
     SPARK_HOME=/opt/local/spark \
     PYSPARK_DRIVER_PYTHON=/opt/local/python-3/bin/python3 \
     PYSPARK_PYTHON=/opt/local/python-3/bin/python3 \
-#    SPARK_EXECUTOR_URI=file:///opt/local/spark/dist/spark-2.3.0-bin-${X_HADOOP_VERSION}.tgz \
     SPARK_EXECUTOR_URI=file:///opt/local/spark/dist/spark-2.3.0-bin-2.9.0.tgz \
-    X_HADOOP_VERSION=3.0.0 \
+    X_HADOOP_VERSION=3.1.0 \
     LD_LIBRARY_PATH=/usr/lib/hadoop/lib/native:$LD_LIBRARY_PATH \
     HADOOP_HOME=/usr/lib/hadoop \
     HADOOP_PREFIX=/usr/lib/hadoop \
@@ -27,12 +26,12 @@ ENV \
     HADOOP_OPTS="-Djava.library.path=/usr/lib/hadoop/lib/native" \
     HADOOP_LOG_DIR=/var/log/hadoop \
     HADOOP_PID_DIR=/run/hadoop \
-#    HADOOP_SLAVES=/etc/hadoop/slaves \
     HADOOP_DFS_NAMENODE_NAME_DIR=file:///var/db/hadoop/dfs/name \
     HADOOP_DFS_NAMENODE_CHECKPOINT_DIR=file:///var/db/hadoop/dfs/namesecondary \
     HADOOP_DFS_DATANODE_DATA_DIR=file:///var/db/hadoop/dfs/data
 
 #    X_SPARK_VERSION=2.1.0-rc5 \
+#    SPARK_EXECUTOR_URI=file:///opt/local/spark/dist/spark-2.3.0-bin-${X_HADOOP_VERSION}.tgz \
 #    X_SPARK_CLONE_REPO_CMD="git clone -b branch-2.0 git://git.apache.org/spark.git" \
 #    X_SPARK_DOWNLOAD_URI="https://github.com/apache/spark/archive/v2.1.0-rc5.tar.gz" \
 #    X_SPARK_DOWNLOAD_URI="http://ftp.riken.jp/net/apache/spark/spark-2.0.1/spark-2.0.1.tgz" \
@@ -48,6 +47,7 @@ ENV \
 #    YARN_CONF_DIR=/opt/local/hadoop/etc/hadoop \
 #    HADOOP_USER_NAME=root \
 #    HADOOP_OPTS="-Djava.library.path=/opt/local/hadoop/lib/native" \
+#    HADOOP_SLAVES=/etc/hadoop/slaves \
 #    PATH=/opt/local/hadoop/sbin:/opt/local/hadoop/bin:${PATH} \
 
 RUN \
@@ -164,7 +164,7 @@ RUN \
     rm -rf /root/.gradle/caches && \
     echo -e "${FONT_SUCCESS}[SUCCESS] Install spark-${X_SPARK_VERSION}${FONT_DEFAULT}" && \
 : && \
-    /opt/local/bin/x-archlinux-remove-unnecessary-files.sh && \
+    /opt/local/bin/x-archlinux-remove-unnecessary-files.sh --paccache-keep-num 0 --remove-tmp && \
 #    pacman-optimize && \
     rm -f /etc/machine-id
 
