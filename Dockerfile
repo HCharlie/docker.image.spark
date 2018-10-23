@@ -11,7 +11,7 @@ ENV \
     SPARK_HOME=/opt/local/spark \
     PYSPARK_DRIVER_PYTHON=/opt/local/python-3/bin/python3 \
     PYSPARK_PYTHON=/opt/local/python-3/bin/python3 \
-    SPARK_EXECUTOR_URI=file:///opt/local/spark/dist/spark-2.4.0-bin-2.9.0.tgz \
+    SPARK_EXECUTOR_URI=file:///opt/local/spark/dist/spark-2.4.0-bin-2.9.1.tgz \
     X_HADOOP_VERSION=3.1.1 \
     LD_LIBRARY_PATH=/usr/lib/hadoop/lib/native:$LD_LIBRARY_PATH \
     HADOOP_HOME=/usr/lib/hadoop \
@@ -118,7 +118,7 @@ RUN \
         curl --silent --location --fail --retry 5 -o python/pyspark/serializers.py "https://raw.githubusercontent.com/HyukjinKwon/spark/6458d4185da9ed9772bb4317a82b26da784a89ee/python/pyspark/serializers.py";\
     fi && \
 # Hive does not support hadoop 3.0.0 yet
-    X_HADOOP_VERSION=2.9.0 && \
+    X_HADOOP_VERSION=2.9.1 && \
 #     [[ "$(cut -d. -f1 <<< ${X_HADOOP_VERSION})" != '3' ]] || sed --in-place -e 's|<id>hadoop-2\.7</id>|<id>hadoop-3\.0</id>|g' -e 's|<hadoop\.version>2\.7\.3</hadoop\.version>|<hadoop\.version>3\.0\.0</hadoop\.version>|g' pom.xml && \
     cp -ap conf/log4j.properties.template conf/org.log4j.properties.template && \
     sed --in-place -e 's|log4j\.rootCategory=INFO|log4j\.rootCategory=WARN|g' -e 's|log4j\.logger\.org\.apache\.spark\.repl\.SparkIMain$exprTyper=INFO|log4j\.logger\.org\.apache\.spark\.repl\.SparkIMain$exprTyper=WARN|g' -e 's|log4j\.logger\.org\.apache\.spark\.repl\.SparkILoop$SparkILoopInterpreter=INFO|log4j\.logger\.org\.apache\.spark\.repl\.SparkILoop$SparkILoopInterpreter=WARN|g' conf/log4j.properties.template && \
@@ -152,11 +152,14 @@ RUN \
     /opt/local/python-3/bin/python3 setup.py bdist_wheel && \
     rm -rf build/ .eggs/ pyspark.egg-info/ && \
     cd ../.. && \
-    porg --log --package="spark-${X_SPARK_VERSION}" -- mv dist /opt/local/spark-${X_SPARK_VERSION} && \
-    porg --log --package="spark-${X_SPARK_VERSION}" -+ -- mkdir /opt/local/spark-${X_SPARK_VERSION}/dist && \
-    porg --log --package="spark-${X_SPARK_VERSION}" -+ -- mv spark-${X_INTERNAL_SPARK_VERSION}*.tgz /opt/local/spark-${X_SPARK_VERSION}/dist/. && \
+    mkdir dist/dist && \
+    mv spark-${X_INTERNAL_SPARK_VERSION}*.tgz dist/dist/. && \
+    # porg-0.10 bug?
+    # porg --log --package="spark-${X_SPARK_VERSION}" -- mv dist /opt/local/spark-${X_SPARK_VERSION} && \
+    porg --log --package="spark-${X_SPARK_VERSION}" -- cp -apr dist /opt/local/spark-${X_SPARK_VERSION} && \
+    rm -rf dist && \
     cd /opt/local && \
-    porg --log --package="spark-${X_SPARK_VERSION}" -+ -- ln -sf spark-${X_SPARK_VERSION} spark && \
+    ln -sf spark-${X_SPARK_VERSION} spark && \
 #    porg --log --package="spark-${X_SPARK_VERSION}" -+ -- mv /tmp/log4j-systemd-journal-appender-1.3.2.jar spark-${X_SPARK_VERSION}/jars/. && \
 #    porg --log --package="spark-${X_SPARK_VERSION}" -+ -- cp /usr/share/java/jna.jar spark-${X_SPARK_VERSION}/jars/. && \
     rm -rf /var/tmp/spark-${X_SPARK_VERSION} && \
