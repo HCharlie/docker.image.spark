@@ -2,16 +2,17 @@
 # - build with netlib-java
 # http://qiita.com/adachij2002/items/b9af506d704434f4f293
 
-FROM quay.io/takaomag/netlib-java:release-1.1.2-2018.06.12.03.50
+FROM quay.io/takaomag/netlib-java:release-1.1.2-2018.10.22.06.16
 
 ENV \
     X_DOCKER_REPO_NAME=spark \
-    X_SPARK_VERSION=2.3.0 \
+    X_SPARK_VERSION=2.4.0-rc4 \
+    X_SPARK_DOWNLOAD_URI="https://github.com/apache/spark/archive/v2.4.0-rc4.tar.gz" \
     SPARK_HOME=/opt/local/spark \
     PYSPARK_DRIVER_PYTHON=/opt/local/python-3/bin/python3 \
     PYSPARK_PYTHON=/opt/local/python-3/bin/python3 \
-    SPARK_EXECUTOR_URI=file:///opt/local/spark/dist/spark-2.3.0-bin-2.9.0.tgz \
-    X_HADOOP_VERSION=3.1.0 \
+    SPARK_EXECUTOR_URI=file:///opt/local/spark/dist/spark-2.4.0-bin-2.9.0.tgz \
+    X_HADOOP_VERSION=3.1.1 \
     LD_LIBRARY_PATH=/usr/lib/hadoop/lib/native:$LD_LIBRARY_PATH \
     HADOOP_HOME=/usr/lib/hadoop \
     HADOOP_PREFIX=/usr/lib/hadoop \
@@ -69,7 +70,9 @@ RUN \
     # pandoc/pypandoc is only required for the description in setup.py. Ignore the message "Could not import pypandoc - required to package PySpark". See setup.py
     # https://github.com/apache/spark/blob/master/python/setup.py
     # REQUIRED_PACKAGES=("boost" "gperftools" "google-glog" "leveldb" "protobuf" "protobuf-java" "picojson-git") && \
-    REQUIRED_PACKAGES=("hadoop" "gperftools" "google-glog" "leveldb" "protobuf" "picojson-git") && \
+    # REQUIRED_PACKAGES=("hadoop" "gperftools" "google-glog" "leveldb" "protobuf" "picojson-git") && \
+    # Removed packages required by mesos
+    REQUIRED_PACKAGES=("hadoop") && \
 : && \
     echo -e "${FONT_INFO}[INFO] Install required packages [${REQUIRED_PACKAGES[@]}]${FONT_DEFAULT}" && \
     sudo -u x-aur-helper yay -S --needed --noconfirm --noprogressbar ${REQUIRED_PACKAGES[@]} && \
