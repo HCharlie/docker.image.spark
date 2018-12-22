@@ -2,12 +2,11 @@
 # - build with netlib-java
 # http://qiita.com/adachij2002/items/b9af506d704434f4f293
 
-FROM quay.io/takaomag/netlib-java:release-1.1.2-2018.10.22.06.16
+FROM quay.io/takaomag/netlib-java:release-1.1.2-2018.12.22.01.45
 
 ENV \
     X_DOCKER_REPO_NAME=spark \
-    X_SPARK_VERSION=2.4.0-rc4 \
-    X_SPARK_DOWNLOAD_URI="https://github.com/apache/spark/archive/v2.4.0-rc4.tar.gz" \
+    X_SPARK_VERSION=2.4.0 \
     SPARK_HOME=/opt/local/spark \
     PYSPARK_DRIVER_PYTHON=/opt/local/python-3/bin/python3 \
     PYSPARK_PYTHON=/opt/local/python-3/bin/python3 \
@@ -36,6 +35,7 @@ ENV \
 #    X_SPARK_CLONE_REPO_CMD="git clone -b branch-2.0 git://git.apache.org/spark.git" \
 #    X_SPARK_DOWNLOAD_URI="https://github.com/apache/spark/archive/v2.1.0-rc5.tar.gz" \
 #    X_SPARK_DOWNLOAD_URI="http://ftp.riken.jp/net/apache/spark/spark-2.0.1/spark-2.0.1.tgz" \
+#    X_SPARK_DOWNLOAD_URI="https://github.com/apache/spark/archive/v2.4.0-rc4.tar.gz" \
 
 #    HADOOP_HOME=/opt/local/hadoop \
 #    HADOOP_PREFIX=/opt/local/hadoop \
@@ -98,7 +98,7 @@ RUN \
     echo -e "${FONT_SUCCESS}[SUCCESS] Install hadoop-${X_HADOOP_VERSION}${FONT_DEFAULT}" && \
 : && \
     echo -e "${FONT_INFO}[INFO] Install spark-${X_SPARK_VERSION}${FONT_DEFAULT}" && \
-    archlinux-java set java-8-openjdk && \
+    archlinux-java set java-11-openjdk && \
     ([ -d /opt/local ] || mkdir -p /opt/local) && \
     cd /var/tmp && \
     if [[ "${X_SPARK_CLONE_REPO_CMD}" ]];then\
