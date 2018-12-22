@@ -98,7 +98,7 @@ RUN \
     echo -e "${FONT_SUCCESS}[SUCCESS] Install hadoop-${X_HADOOP_VERSION}${FONT_DEFAULT}" && \
 : && \
     echo -e "${FONT_INFO}[INFO] Install spark-${X_SPARK_VERSION}${FONT_DEFAULT}" && \
-    archlinux-java set java-11-openjdk && \
+    archlinux-java set java-8-openjdk && \
     ([ -d /opt/local ] || mkdir -p /opt/local) && \
     cd /var/tmp && \
     if [[ "${X_SPARK_CLONE_REPO_CMD}" ]];then\
@@ -168,6 +168,7 @@ RUN \
     rm -rf /root/.m2/repository && \
     rm -rf /root/.ivy2/cache && \
     rm -rf /root/.gradle/caches && \
+    archlinux-java set java-11-openjdk && \
     echo -e "${FONT_SUCCESS}[SUCCESS] Install spark-${X_SPARK_VERSION}${FONT_DEFAULT}" && \
 : && \
     /opt/local/bin/x-archlinux-remove-unnecessary-files.sh --paccache-keep-num 0 --remove-tmp && \
