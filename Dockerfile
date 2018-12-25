@@ -11,7 +11,7 @@ ENV \
     PYSPARK_DRIVER_PYTHON=/opt/local/python-3/bin/python3 \
     PYSPARK_PYTHON=/opt/local/python-3/bin/python3 \
     X_HADOOP_VERSION=3.1.1 \
-    SPARK_EXECUTOR_URI=file:///opt/local/spark/dist/spark-2.4.0-bin-${X_HADOOP_VERSION}.tgz \
+    SPARK_EXECUTOR_URI=file:///opt/local/spark/dist/spark-2.4.0-bin-3.1.1.tgz \
     LD_LIBRARY_PATH=/usr/lib/hadoop/lib/native:$LD_LIBRARY_PATH \
     HADOOP_HOME=/usr/lib/hadoop \
     HADOOP_PREFIX=/usr/lib/hadoop \
