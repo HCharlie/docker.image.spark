@@ -2,7 +2,7 @@
 # - build with netlib-java
 # http://qiita.com/adachij2002/items/b9af506d704434f4f293
 
-FROM quay.io/takaomag/netlib-java:release-1.1.2-2018.12.22.01.45
+FROM quay.io/takaomag/netlib-java:release-1.1.2-2018.12.25.01.10
 
 ENV \
     X_DOCKER_REPO_NAME=spark \
@@ -10,8 +10,8 @@ ENV \
     SPARK_HOME=/opt/local/spark \
     PYSPARK_DRIVER_PYTHON=/opt/local/python-3/bin/python3 \
     PYSPARK_PYTHON=/opt/local/python-3/bin/python3 \
-    SPARK_EXECUTOR_URI=file:///opt/local/spark/dist/spark-2.4.0-bin-2.9.1.tgz \
     X_HADOOP_VERSION=3.1.1 \
+    SPARK_EXECUTOR_URI=file:///opt/local/spark/dist/spark-2.4.0-bin-${X_HADOOP_VERSION}.tgz \
     LD_LIBRARY_PATH=/usr/lib/hadoop/lib/native:$LD_LIBRARY_PATH \
     HADOOP_HOME=/usr/lib/hadoop \
     HADOOP_PREFIX=/usr/lib/hadoop \
@@ -118,7 +118,7 @@ RUN \
         curl --silent --location --fail --retry 5 -o python/pyspark/serializers.py "https://raw.githubusercontent.com/HyukjinKwon/spark/6458d4185da9ed9772bb4317a82b26da784a89ee/python/pyspark/serializers.py";\
     fi && \
 # Hive does not support hadoop 3.0.0 yet
-    X_HADOOP_VERSION=2.9.1 && \
+#    X_HADOOP_VERSION=2.9.1 && \
 #     [[ "$(cut -d. -f1 <<< ${X_HADOOP_VERSION})" != '3' ]] || sed --in-place -e 's|<id>hadoop-2\.7</id>|<id>hadoop-3\.0</id>|g' -e 's|<hadoop\.version>2\.7\.3</hadoop\.version>|<hadoop\.version>3\.0\.0</hadoop\.version>|g' pom.xml && \
     cp -ap conf/log4j.properties.template conf/org.log4j.properties.template && \
     sed --in-place -e 's|log4j\.rootCategory=INFO|log4j\.rootCategory=WARN|g' -e 's|log4j\.logger\.org\.apache\.spark\.repl\.SparkIMain$exprTyper=INFO|log4j\.logger\.org\.apache\.spark\.repl\.SparkIMain$exprTyper=WARN|g' -e 's|log4j\.logger\.org\.apache\.spark\.repl\.SparkILoop$SparkILoopInterpreter=INFO|log4j\.logger\.org\.apache\.spark\.repl\.SparkILoop$SparkILoopInterpreter=WARN|g' conf/log4j.properties.template && \
@@ -131,8 +131,12 @@ RUN \
     if [[ ${X_INTERNAL_SPARK_VERSION_MAJOR} -ge 2 ]];then\
       ${MAKE_DIST_PATH} --tgz -Pyarn -Phadoop-2.7 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver -Pmesos -Pkubernetes ${X_WITH_NETLIB};\
     else\
-      ${MAKE_DIST_PATH} --tgz --skip-java-test --with-tachyon -Pyarn -Phadoop-2.7 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver ${X_WITH_NETLIB};\
+      ${MAKE_DIST_PATH} --tgz --skip-java-test --with-tachyon -Pyarn -Phadoop-3.1 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver ${X_WITH_NETLIB};\
     fi && \
+    cd python && \
+    /opt/local/python-3/bin/python3 setup.py sdist && \
+    /opt/local/python-3/bin/python3 setup.py bdist_wheel && \
+    cd .. && \
     cp -ap dist/conf/log4j.properties.template dist/conf/log4j.properties && \
     mkdir x_mago_dist && \
     tar xvzf spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}.tgz -C x_mago_dist/. && \
@@ -140,18 +144,10 @@ RUN \
 #    cp /tmp/log4j-systemd-journal-appender-1.3.2.jar x_mago_dist/spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}/jars/. && \
 #    cp /usr/share/java/jna.jar x_mago_dist/spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}/jars/. && \
     cp -ap x_mago_dist/spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}/conf/log4j.properties.template x_mago_dist/spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}/conf/log4j.properties && \
-    cd x_mago_dist/spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}/python && \
-    /opt/local/python-3/bin/python3 setup.py sdist && \
-    /opt/local/python-3/bin/python3 setup.py bdist_wheel && \
-    rm -rf build/ .eggs/ pyspark.egg-info/ && \
-    cd ../../.. && \
+    cp -apr python/dist x_mago_dist/spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}/python/. && \
+    cp -apr python/dist dist/python/. && \
     tar -C x_mago_dist -czf spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION}.tgz spark-${X_INTERNAL_SPARK_VERSION}-bin-${X_HADOOP_VERSION} && \
     rm -rf x_mago_dist && \
-    cd dist/python && \
-    /opt/local/python-3/bin/python3 setup.py sdist && \
-    /opt/local/python-3/bin/python3 setup.py bdist_wheel && \
-    rm -rf build/ .eggs/ pyspark.egg-info/ && \
-    cd ../.. && \
     mkdir dist/dist && \
     mv spark-${X_INTERNAL_SPARK_VERSION}*.tgz dist/dist/. && \
     # porg-0.10 bug?
