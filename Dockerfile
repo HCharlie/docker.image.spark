@@ -2,16 +2,17 @@
 # - build with netlib-java
 # http://qiita.com/adachij2002/items/b9af506d704434f4f293
 
-FROM quay.io/takaomag/netlib-java:release-1.1.2-2018.12.25.01.10
+# FROM quay.io/takaomag/netlib-java:release-1.1.2-2018.12.25.01.10
+FROM quay.io/takaomag/openblas:release-0.3.7-2019.12.03.03.00
 
 ENV \
     X_DOCKER_REPO_NAME=spark \
-    X_SPARK_VERSION=2.4.0 \
+    X_SPARK_VERSION=2.4.4 \
     SPARK_HOME=/opt/local/spark \
     PYSPARK_DRIVER_PYTHON=/opt/local/python-3/bin/python3 \
     PYSPARK_PYTHON=/opt/local/python-3/bin/python3 \
-    X_HADOOP_VERSION=3.1.1 \
-    SPARK_EXECUTOR_URI=file:///opt/local/spark/dist/spark-2.4.0-bin-3.1.1.tgz \
+    X_HADOOP_VERSION=3.2.1 \
+    SPARK_EXECUTOR_URI=file:///opt/local/spark/dist/spark-2.4.4-bin-3.2.1.tgz \
     LD_LIBRARY_PATH=/usr/lib/hadoop/lib/native:$LD_LIBRARY_PATH \
     HADOOP_HOME=/usr/lib/hadoop \
     HADOOP_PREFIX=/usr/lib/hadoop \
@@ -131,7 +132,8 @@ RUN \
     if [[ ${X_INTERNAL_SPARK_VERSION_MAJOR} -ge 2 ]];then\
       ${MAKE_DIST_PATH} --tgz -Pyarn -Phadoop-2.7 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver -Pmesos -Pkubernetes ${X_WITH_NETLIB};\
     else\
-      ${MAKE_DIST_PATH} --tgz --skip-java-test --with-tachyon -Pyarn -Phadoop-3.1 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver ${X_WITH_NETLIB};\
+#      ${MAKE_DIST_PATH} --tgz --skip-java-test --with-tachyon -Pyarn -Phadoop-3.2 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver ${X_WITH_NETLIB};\
+      ${MAKE_DIST_PATH} --tgz --skip-java-test --with-tachyon -Pyarn -Phadoop-3.2 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver;\
     fi && \
     cd python && \
     /opt/local/python-3/bin/python3 setup.py sdist && \
