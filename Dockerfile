@@ -76,7 +76,12 @@ RUN \
     REQUIRED_PACKAGES=("hadoop") && \
 : && \
     echo -e "${FONT_INFO}[INFO] Install required packages [${REQUIRED_PACKAGES[@]}]${FONT_DEFAULT}" && \
-    sudo -u x-aur-helper yay -S --needed --noconfirm --noprogressbar ${REQUIRED_PACKAGES[@]} && \
+#   temporary comment-out, because of yay install error
+#   https://aur.archlinux.org/packages/hadoop/#comment-719276
+#    sudo -u x-aur-helper yay -S --needed --noconfirm --noprogressbar ${REQUIRED_PACKAGES[@]} && \
+    sudo -u x-aur-helper yay -S --needed --noconfirm --noprogressbar pikaur && \
+    sudo -u x-aur-helper pikaur -S --needed --noconfirm --noprogressbar ${REQUIRED_PACKAGES[@]} && \
+    pacman -R --noconfirm pikaur && \
     echo -e "${FONT_SUCCESS}[SUCCESS] Install required packages [${REQUIRED_PACKAGES[@]}]${FONT_DEFAULT}" && \
 : && \
     echo -e "${FONT_INFO}[INFO] Install hadoop-${X_HADOOP_VERSION}${FONT_DEFAULT}" && \
