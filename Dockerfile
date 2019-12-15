@@ -9,8 +9,9 @@ ENV \
     X_DOCKER_REPO_NAME=spark \
     X_SPARK_VERSION=2.4.4 \
     SPARK_HOME=/opt/local/spark \
-    PYSPARK_DRIVER_PYTHON=/opt/local/python-3/bin/python3 \
-    PYSPARK_PYTHON=/opt/local/python-3/bin/python3 \
+    PYSPARK_PYTHON_VERSION=3.7.5 \
+    PYSPARK_DRIVER_PYTHON=/opt/local/python-3.7.5/bin/python3 \
+    PYSPARK_PYTHON=/opt/local/python-3.7.5/bin/python3 \
     X_HADOOP_VERSION=3.2.1 \
     SPARK_EXECUTOR_URI=file:///opt/local/spark/dist/spark-2.4.4-bin-3.2.1.tgz \
     LD_LIBRARY_PATH=/usr/lib/hadoop/lib/native:$LD_LIBRARY_PATH \
@@ -51,6 +52,9 @@ ENV \
 #    HADOOP_OPTS="-Djava.library.path=/opt/local/hadoop/lib/native" \
 #    HADOOP_SLAVES=/etc/hadoop/slaves \
 #    PATH=/opt/local/hadoop/sbin:/opt/local/hadoop/bin:${PATH} \
+
+# spark-2.4.4 does not support python-3.8
+ADD files/tmp/install_python.sh /tmp/install_python.sh
 
 RUN \
     echo "2016-05-06-1" > /dev/null && \
@@ -102,6 +106,16 @@ RUN \
     mkdir -p --mode=0744 ${HADOOP_PID_DIR} && \
     chown hadoop:hadoop ${HADOOP_PID_DIR} && \
     echo -e "${FONT_SUCCESS}[SUCCESS] Install hadoop-${X_HADOOP_VERSION}${FONT_DEFAULT}" && \
+# spark-2.4.4 does not support python-3.8
+: && \
+    chown root:root /tmp/install_python.sh && \
+    chmod 744 /tmp/install_python.sh && \
+    /tmp/install_python.sh --python-version ${PYSPARK_PYTHON_VERSION} --prefix /opt/local/python-${PYSPARK_PYTHON_VERSION} --base-working-dir /var/tmp && \
+    cd /opt/local && \
+    ln -sf python-${PYSPARK_PYTHON_VERSION} python-pyspark && \
+    /opt/local/python-${PYSPARK_PYTHON_VERSION}/bin/python$(echo ${PYSPARK_PYTHON_VERSION} | cut -d '.' -f 1,2) -m ensurepip --upgrade && \
+    /opt/local/python-${PYSPARK_PYTHON_VERSION}/bin/pip$(echo ${PYSPARK_PYTHON_VERSION} | cut -d '.' -f 1) install --upgrade pip setuptools wheel && \
+    rm -f /tmp/install_python.sh && \
 : && \
     echo -e "${FONT_INFO}[INFO] Install spark-${X_SPARK_VERSION}${FONT_DEFAULT}" && \
     archlinux-java set java-8-openjdk && \
@@ -141,8 +155,8 @@ RUN \
       ${MAKE_DIST_PATH} --tgz --skip-java-test --with-tachyon -Pyarn -Phadoop-3.2 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver;\
     fi && \
     cd python && \
-    /opt/local/python-3/bin/python3 setup.py sdist && \
-    /opt/local/python-3/bin/python3 setup.py bdist_wheel && \
+    /opt/local/python-${PYSPARK_PYTHON_VERSION}/bin/python3 setup.py sdist && \
+    /opt/local/python-${PYSPARK_PYTHON_VERSION}/bin/python3 setup.py bdist_wheel && \
     cd .. && \
     cp -ap dist/conf/log4j.properties.template dist/conf/log4j.properties && \
     mkdir x_mago_dist && \
@@ -167,7 +181,8 @@ RUN \
 #    porg --log --package="spark-${X_SPARK_VERSION}" -+ -- cp /usr/share/java/jna.jar spark-${X_SPARK_VERSION}/jars/. && \
     rm -rf /var/tmp/spark-${X_SPARK_VERSION} && \
 #    /opt/local/python-3/bin/pip3 install -U /opt/local/spark/python/dist/*.tar.gz && \
-    /opt/local/python-3/bin/pip3 install -U /opt/local/spark/python/dist/*.whl && \
+#    /opt/local/python-3/bin/pip3 install -U /opt/local/spark/python/dist/*.whl && \
+    /opt/local/python-${PYSPARK_PYTHON_VERSION}/bin/pip3 install -U /opt/local/spark/python/dist/*.whl && \
     rm -rf /root/.m2/repository && \
     rm -rf /root/.ivy2/cache && \
     rm -rf /root/.gradle/caches && \
