@@ -150,7 +150,7 @@ RUN \
     export MAVEN_OPTS="-Xmx2g -XX:ReservedCodeCacheSize=512m" && \
     if [[ ${X_INTERNAL_SPARK_VERSION_MAJOR} -ge 2 ]];then\
 #      ${MAKE_DIST_PATH} --tgz -Pyarn -Phadoop-2.7 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver -Pmesos -Pkubernetes ${X_WITH_NETLIB};\
-      ${MAKE_DIST_PATH} --tgz -Phadoop-3.2 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver -Pyarn -Pkubernetes -DskipTests;
+      ${MAKE_DIST_PATH} --tgz -Phadoop-3.2 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver -Pyarn -Pkubernetes -DskipTests;\
     else\
 #      ${MAKE_DIST_PATH} --tgz --skip-java-test --with-tachyon -Pyarn -Phadoop-3.2 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver ${X_WITH_NETLIB};\
       ${MAKE_DIST_PATH} --tgz --skip-java-test --with-tachyon -Pyarn -Phadoop-3.2 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver;\
