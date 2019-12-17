@@ -12,7 +12,7 @@ ENV \
     PYSPARK_PYTHON_VERSION=3.7.5 \
     PYSPARK_DRIVER_PYTHON=/opt/local/python-3.7.5/bin/python3 \
     PYSPARK_PYTHON=/opt/local/python-3.7.5/bin/python3 \
-    X_HADOOP_VERSION=3.2.1 \
+    X_HADOOP_VERSION=3.2.0 \
     SPARK_EXECUTOR_URI=file:///opt/local/spark/dist/spark-2.4.4-bin-3.2.1.tgz \
     LD_LIBRARY_PATH=/usr/lib/hadoop/lib/native:$LD_LIBRARY_PATH \
     HADOOP_HOME=/usr/lib/hadoop \
@@ -138,7 +138,6 @@ RUN \
         curl --silent --location --fail --retry 5 -o python/pyspark/serializers.py "https://raw.githubusercontent.com/HyukjinKwon/spark/6458d4185da9ed9772bb4317a82b26da784a89ee/python/pyspark/serializers.py";\
     fi && \
 # Hive does not support hadoop 3.2.1 yet
-    X_HADOOP_VERSION=3.2.0 && \
 #     [[ "$(cut -d. -f1 <<< ${X_HADOOP_VERSION})" != '3' ]] || sed --in-place -e 's|<id>hadoop-2\.7</id>|<id>hadoop-3\.0</id>|g' -e 's|<hadoop\.version>2\.7\.3</hadoop\.version>|<hadoop\.version>3\.0\.0</hadoop\.version>|g' pom.xml && \
     cp -ap conf/log4j.properties.template conf/org.log4j.properties.template && \
     sed --in-place -e 's|log4j\.rootCategory=INFO|log4j\.rootCategory=WARN|g' -e 's|log4j\.logger\.org\.apache\.spark\.repl\.SparkIMain$exprTyper=INFO|log4j\.logger\.org\.apache\.spark\.repl\.SparkIMain$exprTyper=WARN|g' -e 's|log4j\.logger\.org\.apache\.spark\.repl\.SparkILoop$SparkILoopInterpreter=INFO|log4j\.logger\.org\.apache\.spark\.repl\.SparkILoop$SparkILoopInterpreter=WARN|g' conf/log4j.properties.template && \
