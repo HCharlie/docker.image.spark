@@ -118,7 +118,7 @@ RUN \
     export X_INTERNAL_SPARK_VERSION=$(build/mvn help:evaluate -Dexpression=project.version 2>/dev/null | egrep -v -e '^\[.+\]' | tail -n 1) && \
     [[ -f ./make-distribution.sh ]] && MAKE_DIST_PATH='./make-distribution.sh' || MAKE_DIST_PATH='dev/make-distribution.sh' && \
     export JAVA_HOME=/usr/lib/jvm/java-8-openjdk && \
-    export MAVEN_OPTS="-Xmx2g -XX:ReservedCodeCacheSize=1g" && \
+    export MAVEN_OPTS="-Xmx2g -XX:ReservedCodeCacheSize=512m" && \
 #    ${MAKE_DIST_PATH} --tgz -Phadoop-3.2 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver -Pyarn -Pkubernetes -Pnetlib-lgpl -DskipTests && \
     ${MAKE_DIST_PATH} --tgz -Phadoop-3.2 -Dhadoop.version=${X_HADOOP_VERSION} -Phive -Phive-thriftserver -Pyarn -Pkubernetes -DskipTests && \
     cd python && \
